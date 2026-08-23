@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Checks the viewport's shading before it can reach a screen.
+
+    It exists because two faults got past code review and only showed up as a
+    wrong-looking costume: a constant group padded to three floats instead of
+    four, which shifted every channel selector after it, and a shader that would
+    not compile at all because a variable was named after a reserved word. Both
+    are caught here in about a second.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>OmegaAssetStudio2.RenderChecks</AssemblyName>
+    <RootNamespace>OmegaAssetStudio2.RenderChecks</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      The sweep draws every model in the game through the same shading the
+      viewport uses, so it needs the readers and the shading values.
+    -->
+    <ProjectReference Include="..\OmegaAssetStudio2.Core\OmegaAssetStudio2.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Vortice.Direct3D11" />
+    <PackageReference Include="Vortice.D3DCompiler" />
+    <PackageReference Include="Vortice.DXGI" />
+    <PackageReference Include="Vortice.Mathematics" />
+  </ItemGroup>
+
+</Project>

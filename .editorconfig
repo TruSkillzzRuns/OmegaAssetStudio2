@@ -1,0 +1,67 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml,xml,props,targets,csproj,slnf}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# --- usings ---
+csharp_using_directive_placement = outside_namespace:warning
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# --- file-scoped namespaces, one type per file ---
+csharp_style_namespace_declarations = file_scoped:warning
+
+# --- modern C# the codebase already uses ---
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+csharp_prefer_braces = when_multiline:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+
+# --- naming ---
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+
+dotnet_naming_rule.constants_pascal.severity = warning
+dotnet_naming_rule.constants_pascal.symbols = constants
+dotnet_naming_rule.constants_pascal.style = pascal
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.required_modifiers = const
+dotnet_naming_style.pascal.capitalization = pascal_case
+
+# --- correctness rules that map to defects this codebase has actually hit ---
+# stackalloc inside a loop exhausts the thread stack. This was a real crash.
+dotnet_diagnostic.CA2014.severity = error
+# Dispose what you allocate.
+dotnet_diagnostic.CA2000.severity = suggestion
+# An empty catch that swallows everything hides failed writes.
+dotnet_diagnostic.CA1031.severity = none
+# Unused locals: noisy in carried-over code, still worth surfacing.
+dotnet_diagnostic.CS0219.severity = suggestion
+
+# --- vendored third-party code is not ours to restyle ---
+[vendor/**/*.cs]
+dotnet_analyzer_diagnostic.severity = none
+csharp_style_namespace_declarations = block_scoped:none
+dotnet_diagnostic.CA2014.severity = warning

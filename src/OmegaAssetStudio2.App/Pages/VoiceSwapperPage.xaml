@@ -1,0 +1,288 @@
+<Page
+    x:Class="OmegaAssetStudio2.App.Pages.VoiceSwapperPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:OmegaAssetStudio2.App.Controls"
+    xmlns:pages="using:OmegaAssetStudio2.App.Pages">
+
+    <Grid Padding="{StaticResource Omega.PagePadding}" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="10">
+            <controls:ToolHeader
+                Title="Voice Swapper"
+                Subtitle="Browse the game's sounds, listen to them, and swap one for another." />
+            <StackPanel Orientation="Horizontal" Spacing="16"
+                        HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                <controls:ClientSelector x:Name="ClientPicker" />
+
+                <StackPanel Spacing="4" VerticalAlignment="Bottom">
+                    <TextBlock Text="Language" Style="{StaticResource Omega.PageSubtitle}" />
+                    <ComboBox x:Name="LanguagePicker" MinWidth="200"
+                              DisplayMemberPath="Label"
+                              SelectionChanged="LanguagePicker_SelectionChanged" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="180" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="ScanButton" Grid.Column="0" Content="Find sounds" Click="ScanButton_Click" />
+            <TextBox x:Name="SearchBox" Grid.Column="1"
+                     PlaceholderText="Search by character or language"
+                     TextChanged="SearchBox_TextChanged" />
+            <TextBlock x:Name="CountText" Grid.Column="2" VerticalAlignment="Center"
+                       Style="{StaticResource Omega.PageSubtitle}" />
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" MinWidth="220" />
+                <ColumnDefinition Width="*" MinWidth="260" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="400" MinWidth="340" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}">
+                <!-- One collapsible section per category. They start closed, so
+                     a search returns a short list of headings rather than 227
+                     rows to scroll past. -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="PackageGroups">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="pages:AudioPackageGroup">
+                                <Expander HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Stretch"
+                                          Margin="0,0,0,4"
+                                          IsExpanded="{x:Bind IsOpen, Mode=TwoWay}">
+                                    <Expander.Header>
+                                        <TextBlock Text="{x:Bind Heading}"
+                                                   Style="{StaticResource Omega.RowText}"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="SemiBold" />
+                                    </Expander.Header>
+
+                                    <ListView ItemsSource="{x:Bind}"
+                                              SelectionMode="Single"
+                                              SelectionChanged="GroupList_SelectionChanged"
+                                              ItemContainerStyle="{StaticResource Omega.ListRow}">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="pages:AudioPackageRow">
+                                                <StackPanel Padding="4,10,4,10" Spacing="3">
+                                                    <TextBlock Text="{x:Bind Subject}"
+                                                               Style="{StaticResource Omega.RowText}"
+                                                               TextWrapping="Wrap"
+                                                               FontWeight="SemiBold" />
+                                                    <TextBlock Text="{x:Bind Detail}"
+                                                               Style="{StaticResource Omega.RowText}"
+                                                               TextWrapping="Wrap"
+                                                               FontSize="12"
+                                                               Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+
+                                                    <!-- Only for characters whose costumes change
+                                                         their voice. Their lines usually live in
+                                                         another container, so choosing one here
+                                                         goes and finds them. -->
+                                                    <ComboBox ItemsSource="{x:Bind Costumes}"
+                                                              Visibility="{x:Bind CostumeVisibility}"
+                                                              DisplayMemberPath="Costume"
+                                                              PlaceholderText="Costume voice"
+                                                              HorizontalAlignment="Stretch"
+                                                              Margin="0,4,0,0"
+                                                              SelectionChanged="CostumePicker_SelectionChanged" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}">
+                <Grid RowSpacing="8" Padding="8,8,8,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- The shared container holds every launch hero's spoken
+                         lines — 18,380 of them — so finding one by scrolling is
+                         not a thing a person can do. -->
+                    <TextBox x:Name="SoundSearchBox" Grid.Row="0"
+                             PlaceholderText="Search these sounds by name, e.g. thor"
+                             TextChanged="SoundSearchBox_TextChanged" />
+
+                <!-- Grouped by what the sound is for, worked out from the name
+                     recovered for it. Open on arrival: the container has just
+                     been chosen, so its contents are what was asked for. -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="SoundGroups">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="pages:SoundGroup">
+                                <Expander HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Stretch"
+                                          Margin="0,0,0,4"
+                                          IsExpanded="{x:Bind IsOpen, Mode=TwoWay}">
+                                    <Expander.Header>
+                                        <TextBlock Text="{x:Bind Heading}"
+                                                   Style="{StaticResource Omega.RowText}"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="SemiBold" />
+                                    </Expander.Header>
+
+                                    <ListView ItemsSource="{x:Bind}"
+                                              SelectionMode="Single"
+                                              SelectionChanged="SoundList_SelectionChanged"
+                                              ItemContainerStyle="{StaticResource Omega.ListRow}">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="pages:SoundRow">
+                                                <Grid Padding="4,8,4,8" ColumnSpacing="10">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{x:Bind Name}"
+                                                               Style="{StaticResource Omega.RowText}"
+                                                               TextWrapping="Wrap"
+                                                               FontSize="12" />
+                                                    <TextBlock Grid.Column="1" Text="{x:Bind SizeText}"
+                                                               Style="{StaticResource Omega.PageSubtitle}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <controls:PanelSplitter Grid.Column="2" />
+
+            <ScrollViewer Grid.Column="3">
+                <StackPanel Spacing="12">
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Listen" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailName"
+                                       Style="{StaticResource Omega.NameText}"
+                                       FontSize="16" FontWeight="SemiBold"
+                                       Text="Nothing selected" />
+                            <MediaPlayerElement x:Name="Player" Height="70"
+                                                AreTransportControlsEnabled="True" />
+                            <TextBlock x:Name="PlayMessage" Style="{StaticResource Omega.NameText}" FontSize="12"
+                                       Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+
+                            <!-- Shown only when the decoder is not installed.
+                                 It is not shipped with this application: it
+                                 carries codec libraries under licences this
+                                 project has no need to pass on, so the user
+                                 fetches it once under its own terms. -->
+                            <StackPanel x:Name="DecoderMissingPanel" Spacing="8" Visibility="Collapsed">
+                                <TextBlock Style="{StaticResource Omega.NameText}" FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Text="Listening needs vgmstream, a free decoder that is not part of this application. Download it, then point this at the folder you unzipped — you only have to do it once." />
+
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button x:Name="GetDecoderButton" Grid.Column="0"
+                                            HorizontalAlignment="Stretch"
+                                            Style="{ThemeResource AccentButtonStyle}"
+                                            Content="Get vgmstream" Click="GetDecoderButton_Click" />
+
+                                    <Button x:Name="FindDecoderButton" Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            Content="I already have it…" Click="FindDecoderButton_Click" />
+                                </Grid>
+
+                                <TextBlock x:Name="DecoderPathText" Style="{StaticResource Omega.NameText}"
+                                           FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Swap" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                                       Text="A replacement must be a .wem no larger than the sound it replaces. Export the original first to see the size you have to work with." />
+                            <Button x:Name="ExportButton" Content="Export this sound"
+                                    IsEnabled="False" HorizontalAlignment="Stretch"
+                                    Click="ExportButton_Click" />
+                            <Button x:Name="ReplaceButton" Content="Replace this sound"
+                                    IsEnabled="False" HorizontalAlignment="Stretch"
+                                    Click="ReplaceButton_Click" />
+                            <TextBlock x:Name="SwapMessage" Style="{StaticResource Omega.NameText}" FontSize="12" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Details" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailInfo" Style="{StaticResource Omega.NameText}"
+                                       FontSize="12" FontFamily="Consolas" Text="—" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Background="{ThemeResource Omega.PanelBrush}"
+                BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Omega.PanelCorner}"
+                Padding="12,10,12,10">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" Style="{StaticResource Omega.NameText}" VerticalAlignment="Center"
+                           Text="Pick a game above, then find sounds." />
+                <ProgressBar x:Name="ScanBar" Grid.Column="1" Width="200"
+                             VerticalAlignment="Center" Visibility="Collapsed" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

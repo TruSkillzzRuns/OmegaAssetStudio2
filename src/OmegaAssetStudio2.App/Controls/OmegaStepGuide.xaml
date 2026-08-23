@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="OmegaAssetStudio2.App.Controls.OmegaStepGuide"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!-- Beginner "how to use" band: a left-to-right numbered step strip.
+         Drive it from a page with a single delimited string, e.g.
+         Steps="Load a file|Pick an item|Edit it|Save". Purely informational. -->
+    <Border Padding="12,7"
+            CornerRadius="6"
+            Background="{ThemeResource OmegaAssetStudio.PanelBackgroundBrush}"
+            BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}"
+            BorderThickness="1">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <TextBlock Text="How to use:"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Opacity="0.7"
+                       VerticalAlignment="Center" />
+            <StackPanel x:Name="StepsHost"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center" />
+        </StackPanel>
+    </Border>
+</UserControl>

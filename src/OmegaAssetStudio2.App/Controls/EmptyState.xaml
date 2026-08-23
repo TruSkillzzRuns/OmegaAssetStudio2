@@ -1,0 +1,49 @@
+<UserControl
+    x:Class="OmegaAssetStudio2.App.Controls.EmptyState"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" MaxWidth="420">
+            <Border Width="56" Height="56"
+                    HorizontalAlignment="Center"
+                    CornerRadius="28"
+                    Background="{ThemeResource OmegaAssetStudio.PanelSecondaryBrush}"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}">
+                <FontIcon x:Name="StateIcon"
+                          FontFamily="Segoe Fluent Icons"
+                          Glyph="&#xE7C3;"
+                          FontSize="22"
+                          Opacity="0.65" />
+            </Border>
+            <TextBlock x:Name="StateTitle"
+                       HorizontalAlignment="Center"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Text="Nothing here yet" />
+            <TextBlock x:Name="StateSubtitle"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"
+                       FontSize="12"
+                       Opacity="0.65"
+                       TextWrapping="Wrap"
+                       Text="Load something to begin." />
+            <Button x:Name="StateAction"
+                    HorizontalAlignment="Center"
+                    MinHeight="30"
+                    Padding="14,5"
+                    Background="Transparent"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}"
+                    CornerRadius="4"
+                    Visibility="Collapsed"
+                    Click="StateAction_Click">
+                <TextBlock x:Name="StateActionLabel" Text="Action" FontSize="12" />
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

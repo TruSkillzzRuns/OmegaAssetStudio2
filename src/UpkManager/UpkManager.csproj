@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The reader from the tool whose costumes load, copied and not rewritten.
+    The swapping code was written against this reader, and rewriting it around
+    a different one is what produced four faults and a day of testing; so the
+    reader comes across with the code that uses it.
+
+    Two differences from the original project, both about what this application
+    will ship:
+
+      - lzo2_64.dll and msvcr100.dll are not here, and neither is the file that
+        called into them. Compression\LzoCompression.cs answers the same
+        interface using the packing this application already carries.
+
+      - MessagePack's version is the one this solution pins for everything,
+        which is higher than the original's and carries a fix the original's
+        does not.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>$(NoWarn);NU1900;CS0168;CS0169;CS0219;CS0414;CS0649;CS1591;CS8509;CA1416</NoWarn>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <AnalysisMode>None</AnalysisMode>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MessagePack" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DDSLib\DDSLib.csproj" />
+    <ProjectReference Include="..\OmegaAssetStudio2.Core\OmegaAssetStudio2.Core.csproj" />
+  </ItemGroup>
+
+</Project>

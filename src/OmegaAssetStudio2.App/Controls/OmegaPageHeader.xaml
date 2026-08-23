@@ -1,0 +1,92 @@
+<UserControl
+    x:Class="OmegaAssetStudio2.App.Controls.OmegaPageHeader"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!-- Header v2: keeps the original Title/Subtitle/RightContent contract
+         (every existing page still works) and adds two optional zones:
+           ChipsContent    - status chips (validity, coverage, signature)
+           PrimaryAction   - single accented button for "the thing I came
+                             here to do" (Save mod / Inject / Apply)
+         Both default to Collapsed when unset so old pages render identically. -->
+    <Border MinHeight="56"
+            Padding="14,8"
+            Background="{ThemeResource OmegaAssetStudio.PanelBackgroundBrush}"
+            BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}"
+            BorderThickness="0,0,0,1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,0"
+                       FontSize="13"
+                       FontWeight="SemiBold"
+                       CharacterSpacing="120"
+                       Foreground="{ThemeResource OmegaAssetStudio.AccentBrush}"
+                       Text="OMEGA" />
+
+            <Rectangle Grid.Column="1"
+                       Width="1"
+                       Margin="0,12,12,12"
+                       Fill="{ThemeResource OmegaAssetStudio.PanelBorderBrush}" />
+
+            <TextBlock x:Name="TitleTextBlock"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="SemiBold" />
+
+            <TextBlock x:Name="SubtitleTextBlock"
+                       Grid.Column="3"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0"
+                       FontSize="12"
+                       Opacity="0.6"
+                       TextTrimming="CharacterEllipsis"
+                       MaxLines="1"
+                       ToolTipService.ToolTip="{Binding Text, ElementName=SubtitleTextBlock}" />
+
+            <!-- CHIPS STRIP — status chips host. Visible only when populated.
+                 Inner ScrollViewer kicks in horizontally if a page injects more
+                 chips than fit in column 4 at a given window width, instead of
+                 silently clipping the trailing chips. -->
+            <Border x:Name="ChipsHost"
+                    Grid.Column="4"
+                    Margin="14,0,0,0"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+                <ScrollViewer HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled">
+                    <ContentPresenter x:Name="ChipsContentPresenter" />
+                </ScrollViewer>
+            </Border>
+
+            <ContentPresenter x:Name="RightContentPresenter"
+                              Grid.Column="6"
+                              Margin="0,0,8,0"
+                              VerticalAlignment="Center" />
+
+            <!-- PRIMARY ACTION — single accent button on the right.
+                 Pages either set this to a Button instance or hide it. -->
+            <Border x:Name="PrimaryActionHost"
+                    Grid.Column="7"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+                <ContentPresenter x:Name="PrimaryActionPresenter" />
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

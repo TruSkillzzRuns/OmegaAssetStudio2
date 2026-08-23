@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The swapping code from the tool whose costumes load, copied and not
+    rewritten - the same files, the same names, the same comments, under the
+    same namespaces. It is kept in a project of its own so that it stays that
+    way: nothing here is meant to be tidied, renamed, or made to match the
+    style of the rest of this application, because every such change is a
+    chance to drop something the game needs.
+
+    It reads packages through UpkManager, which is the reader it was written
+    against and which comes across with it, rather than through this
+    application's own.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <!-- Both as they are set where these files come from, so that the files
+         themselves need no adjusting. -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);CS0168;CS0169;CS0219;CS0414;CS0649;CS1591;CS8509;CA1416</NoWarn>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <AnalysisMode>None</AnalysisMode>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UpkManager\UpkManager.csproj" />
+  </ItemGroup>
+
+</Project>

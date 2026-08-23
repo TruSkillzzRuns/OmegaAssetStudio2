@@ -1,0 +1,137 @@
+Omega Asset Studio 2 - Third-Party Notices
+Last Updated: 2026-08-15
+
+This distribution includes third-party software components. License obligations
+for these components are preserved below and/or by included license files.
+
+================================================================
+Application
+================================================================
+
+Omega Asset Studio 2
+   Path:     LICENSE
+   License:  MIT.
+
+The package reader, the safe-write layer, and the client detection code are
+original to this project. No parsing code is vendored from another codebase.
+
+================================================================
+Bundled Components
+================================================================
+
+None. This application ships no third-party binary of its own beyond the
+managed NuGet packages listed below.
+
+----------------------------------------------------------------
+vgmstream - referenced, never distributed
+----------------------------------------------------------------
+
+   Upstream: https://vgmstream.org/
+             https://github.com/vgmstream/vgmstream
+
+The Voice Swapper can play the game's own sounds, which needs the decoder
+vgmstream. It is NOT included here, and this project distributes no part of
+it.
+
+That is a deliberate choice rather than an oversight. A vgmstream release
+carries a stack of codec libraries under mixed terms - the tool itself is
+ISC-style, its FFmpeg and mpg123 components are LGPL-2.1-or-later, its Xiph
+components are BSD-3-Clause, and its G.719 support derives from ITU-T
+reference code whose terms are not a recognised open-source licence.
+Redistributing all of that means carrying every one of those obligations for
+a feature that is a convenience. Pointing at the upstream download costs the
+user one click and costs this project nothing.
+
+So the application looks for vgmstream-cli.exe rather than supplying it, in
+this order: the folder the user chose, the folder the application runs from,
+and then PATH. When it is not found the Voice Swapper says so and offers a
+button to the upstream download page and a folder picker to point at a copy
+already on the machine. Everything else in the tool works without it; only
+listening is unavailable.
+
+When the user does install it, they obtain it directly from upstream under
+upstream's terms. This project is not in that chain, and no obligation of
+vgmstream's licences attaches to this distribution. The application starts it
+as a separate process and never links it.
+
+================================================================
+NuGet Package Dependencies (Direct References)
+================================================================
+
+Common-knowledge license summaries shown; consult each package's own license
+file for authoritative terms. Review transitive licenses before public
+redistribution.
+
+- Microsoft.WindowsAppSDK         - MIT (with MS redistribution allowance)
+- Vortice.D3DCompiler             - MIT
+- Vortice.Direct3D11              - MIT
+- Vortice.DXGI                    - MIT
+- Vortice.Mathematics             - MIT
+- AssimpNet                       - BSD-3-Clause (wraps Assimp, BSD-3-Clause)
+- SharpGLTF.Toolkit               - MIT
+- System.Drawing.Common           - MIT
+- K4os.Compression.LZ4            - MIT
+
+AssimpNet reads and writes the interchange formats a model is taken out to and
+brought back in through. Its native Assimp library is BSD-3-Clause and requires
+its copyright notice to be preserved in binary distributions, which this file
+does.
+
+Declared in Directory.Packages.props but referenced by nothing, so not
+distributed: BCnEncoder.Net, WriteableBitmapEx, MessagePack.
+
+Test-only:
+- Microsoft.NET.Test.Sdk, xunit, xunit.runner.visualstudio  - MIT / Apache-2.0
+
+================================================================
+No GPL components
+================================================================
+
+This project distributes NO GPL-licensed component. The FFmpeg libraries above
+are an LGPL build, which is a weaker obligation and is met as described.
+
+Version 1 shipped a GPL-2.0-or-later native LZO library (lzo2_64.dll) and
+carried the corresponding source-availability obligation. It is not present
+here: cooked packages are LZO-compressed, and both the decompressor and the
+compressor are implemented in managed code within this project.
+
+One caveat, for the avoidance of doubt. A single test —
+LzoAgainstReferenceTests — can check this project's compressor against the
+reference LZO library by calling lzo2_64.dll, because agreeing with itself
+proves nothing about what the game will accept. That file is NOT in this
+repository, is listed in .gitignore, and is never distributed; the test skips
+itself when it is absent. Anyone wanting to run it supplies their own copy and
+must not commit it.
+
+================================================================
+Action for distributors
+================================================================
+
+- Preserve this file in all binary distributions.
+- Preserve LICENSE (MIT, this application).
+- Do not bundle vgmstream or any of its codec libraries. The application
+  locates a user-installed copy; adding one back to the distribution would
+  pull in LGPL and ITU-T obligations this project does not otherwise carry.
+- Never commit lzo2_64.dll. It is GPL, it is only used by one test, and
+  .gitignore already excludes it.
+- Ship no game content, ever. .gitignore excludes packages, caches, archives,
+  and any model or texture exported from the game.
+
+================================================================
+Trademark / Content Ownership Notice
+================================================================
+
+References in this repository to game terminology, character names, location
+names, or cooked-content class names are descriptive compatibility references
+only and exist because those names appear within the cooked binary data of the
+supported third-party game. They are necessary for parsing the binary format
+and do not imply any affiliation with, endorsement by, or authorization from
+the rights holders of that content.
+
+No rights to third-party trademarks, game assets, or copyrighted content are
+granted by this distribution. The application does not bundle any game-owned
+content. Use of the application requires a separately-installed, licensed copy
+of the supported game.
+
+All trademarks, service marks, and trade names referenced in any user-supplied
+data file remain the property of their respective owners.

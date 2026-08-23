@@ -1,0 +1,99 @@
+# === Build output ===
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+.vs/
+*.binlog
+*.log
+*.tlog
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+*.cache
+*.ilk
+*.pdb
+*.ipdb
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+
+# NOTE: v1 had a blanket `artifacts/` ignore, inherited from the .NET SDK's
+# build-output convention. That directory was also used for source, so five real
+# tool projects sat untracked for months. Ignore only build output, never a
+# whole top-level directory that might hold source.
+artifacts/**/bin/
+artifacts/**/obj/
+
+# === Editor backup files ===
+# v1 ended up with four *.cs.bak.<timestamp> files committed to the repo.
+*.bak
+*.bak.*
+*.orig
+*.rej
+
+# === Distribution ===
+dist/
+publish/
+installer/Output/
+*.msi
+*.msix
+*.cab
+*.nupkg
+*.snupkg
+
+# === Local tooling state ===
+# Working instructions for the assistant, and notes for whoever is at this
+# machine. Neither describes the software, so neither belongs in its history.
+CLAUDE.md
+README.md
+
+.claude/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.code-workspace
+
+# === Game content must never be committed ===
+# These are the user's own licensed game files. They do not belong in source
+# control, and some are hundreds of MB each.
+*.upk
+*.mpk
+*.tfc
+*.pck
+*.mflmesh
+*account*.db
+*.sip
+*.string
+
+# Anything taken out of the game to be edited, and anything brought back. A
+# model exported from a character is that character, in a file — as much the
+# game's content as the package it came from.
+*.fbx
+*.psk
+*.pskx
+*.dae
+*.glb
+*.gltf
+*.dds
+*.tga
+
+# Third-party binaries copied in by hand rather than restored. None of these
+# may be committed or distributed: lzo2_64.dll is GPL and used by one test, and
+# vgmstream carries codec licences this project deliberately does not take on —
+# it is located on the user's own machine, never shipped.
+lzo2_64.dll
+vendor/vgmstream/
+
+# === Stray dev output ===
+stdout.txt
+stderr.txt
+__pycache__/
+*.pyc
+node_modules/

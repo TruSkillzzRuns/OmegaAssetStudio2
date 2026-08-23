@@ -1,0 +1,101 @@
+﻿<Page
+    x:Class="OmegaAssetStudio2.App.Pages.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:OmegaAssetStudio2.App.Controls"
+    xmlns:pages="using:OmegaAssetStudio2.App.Pages">
+
+    <ScrollViewer>
+        <StackPanel Padding="{StaticResource Omega.PagePadding}" Spacing="16">
+            <!--
+                A banner rather than a picture in a box: the strip runs the
+                whole width of the page and the lockup sits on it at the left,
+                where a title would. The image carries the same near-black the
+                artwork was drawn on and the strip is painted the same colour,
+                so the two read as one band with no edge between them.
+            -->
+            <Border Background="#FF0F0F19"
+                    BorderBrush="{ThemeResource Omega.AccentBrush}"
+                    BorderThickness="0,0,0,1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    HorizontalAlignment="Stretch">
+                <Image Source="ms-appx:///Assets/OmegaBanner.png"
+                       Height="112" Stretch="Uniform"
+                       HorizontalAlignment="Left"
+                       AutomationProperties.Name="Omega Asset Studio 2" />
+            </Border>
+
+            <controls:ToolHeader
+                Title="Game installs"
+                Subtitle="Set up your game installs here. Every tool works against whichever one you pick." />
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Game installs" FontWeight="SemiBold" />
+                    <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                               Text="Add each installed version you want to work with. Point at the install folder — the one containing the engine folder — and the cooked content folder is found for you." />
+
+                    <ListView x:Name="ClientList"
+                              SelectionMode="Single"
+                              MaxHeight="320"
+                              SelectionChanged="ClientList_SelectionChanged"
+                              ItemContainerStyle="{StaticResource Omega.ListRow}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="pages:ClientRow">
+                                <Grid Padding="4,10,4,10" ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Spacing="3">
+                                        <TextBlock Text="{x:Bind Name}"
+                                                   Style="{StaticResource Omega.RowText}"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Text="{x:Bind RootPath}"
+                                                   Style="{StaticResource Omega.RowText}"
+                                                   FontSize="12"
+                                                   Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                                        <TextBlock Text="{x:Bind Detail}"
+                                                   Style="{StaticResource Omega.RowText}"
+                                                   FontSize="12"
+                                                   Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{x:Bind ActiveLabel}"
+                                               VerticalAlignment="Center"
+                                               FontWeight="SemiBold"
+                                               Foreground="{ThemeResource Omega.AccentBrush}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Content="Add a game folder" Click="AddClient_Click" />
+                        <Button x:Name="MakeActiveButton" Content="Use this one" IsEnabled="False" Click="MakeActive_Click" />
+                        <Button x:Name="RemoveButton" Content="Remove" IsEnabled="False" Click="Remove_Click" />
+                        <Button Content="Re-check folders" Click="Refresh_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="About package formats" FontWeight="SemiBold" />
+                    <TextBlock Style="{StaticResource Omega.NameText}"
+                               Text="The format shown next to each install is read from its own content files. Two installs can share a format even when they are different game versions — when they do, content can usually move between them without conversion. When they differ, it cannot." />
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="StatusText" Style="{StaticResource Omega.NameText}" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <MSBuildEnableWorkloadResolver>false</MSBuildEnableWorkloadResolver>
+    <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
+    <BuildInParallel>false</BuildInParallel>
+    <NETCoreSdkRuntimeIdentifier>win-x64</NETCoreSdkRuntimeIdentifier>
+    <NETCoreSdkPortableRuntimeIdentifier>win-x64</NETCoreSdkPortableRuntimeIdentifier>
+    <NetCoreRoot>$(MSBuildExtensionsPath)..\..\</NetCoreRoot>
+    <NetCoreTargetingPackRoot>$(NetCoreRoot)packs</NetCoreTargetingPackRoot>
+    <BundledRuntimeIdentifierGraphFile>$(NetCoreRoot)sdk\8.0.419\RuntimeIdentifierGraph.json</BundledRuntimeIdentifierGraphFile>
+  </PropertyGroup>
+
+  <!-- Version is set in ONE place for the whole product. -->
+  <PropertyGroup>
+    <Product>Omega Asset Studio 2</Product>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
+    <Version>2.0.0</Version>
+  </PropertyGroup>
+</Project>

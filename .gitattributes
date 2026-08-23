@@ -1,0 +1,28 @@
+# Normalise line endings so a clone on any machine produces the same bytes.
+* text=auto eol=crlf
+
+*.cs        text diff=csharp
+*.csproj    text
+*.props     text
+*.targets   text
+*.sln       text eol=crlf
+*.xaml      text
+*.json      text
+*.md        text
+*.ps1       text eol=crlf
+*.editorconfig text
+
+# Binary — never diff, never munge line endings.
+*.dll       binary
+*.exe       binary
+*.pdb       binary
+*.ico       binary
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.dds       binary
+*.tfc       binary
+*.upk       binary
+*.pck       binary
+*.wem       binary
+*.fbx       binary

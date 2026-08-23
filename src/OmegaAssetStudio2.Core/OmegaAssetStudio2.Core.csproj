@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Platform>x64</Platform>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Carried-over engine code was written under nullable-disable. Flipping it
+         on here produces hundreds of warnings in code that is known-good; the
+         App project runs nullable-enable, so the boundary is the one place to
+         be careful. Revisit per-subsystem as each is touched. -->
+    <Nullable>disable</Nullable>
+    <!-- Required by the bitmap resize path in the icon replace service, which
+         locks bits and walks rows with pointers. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>OmegaAssetStudio2.Core</AssemblyName>
+    <RootNamespace>OmegaAssetStudio2.Core</RootNamespace>
+    <GenerateResourceWarnOnBinaryFormatterUse>false</GenerateResourceWarnOnBinaryFormatterUse>
+    <NoWarn>$(NoWarn);CS8632;NU1900</NoWarn>
+  </PropertyGroup>
+
+  <!-- Versions live in Directory.Packages.props. -->
+  <ItemGroup>
+    <!-- FBX / glTF mesh import and export. -->
+    <PackageReference Include="AssimpNet" />
+    <PackageReference Include="SharpGLTF.Toolkit" />
+    <!-- Bulk-data decompression paths that are LZ4 rather than LZO. -->
+    <PackageReference Include="K4os.Compression.LZ4" />
+    <!-- Bitmap interop for texture and icon conversion. -->
+    <PackageReference Include="System.Drawing.Common" />
+  </ItemGroup>
+
+</Project>

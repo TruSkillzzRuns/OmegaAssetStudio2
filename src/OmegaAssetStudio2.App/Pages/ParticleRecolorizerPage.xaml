@@ -1,0 +1,622 @@
+﻿<Page
+    x:Class="OmegaAssetStudio2.App.Pages.ParticleRecolorizerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:omega="using:OmegaAssetStudio2.App.Controls"
+    xmlns:ctrls="using:OmegaAssetStudio2.App.Controls"
+    xmlns:oas2="using:OmegaAssetStudio2.App.Controls"
+    NavigationCacheMode="Required"
+    mc:Ignorable="d">
+
+    <!--
+        The page came across from the first studio with a look of its own — a
+        dark blue console with cyan edges and corner brackets. Its markup names
+        every colour and style through these twenty keys, so the whole page is
+        restyled by answering them with this application's own tokens rather
+        than by touching a single element below.
+    -->
+    <Page.Resources>
+        <SolidColorBrush x:Key="PrArcCyan"        Color="{ThemeResource Omega.AccentColor}" />
+        <SolidColorBrush x:Key="PrArcCyanBright"  Color="{ThemeResource Omega.AccentColor}" />
+        <SolidColorBrush x:Key="PrArcCyanDim"     Color="{ThemeResource Omega.AccentColor}" Opacity="0.45" />
+        <SolidColorBrush x:Key="PrArcCyanWhisper" Color="{ThemeResource Omega.AccentColor}" Opacity="0.18" />
+        <SolidColorBrush x:Key="PrRepulsorAmber"  Color="{ThemeResource Omega.ChangedColor}" />
+
+        <!-- The page sits on the application's own background rather than
+             painting one of its own. -->
+        <SolidColorBrush x:Key="PrPageBg"   Color="Transparent" />
+
+        <SolidColorBrush x:Key="PrPanelBg"      Color="{ThemeResource Omega.PanelColor}" />
+        <SolidColorBrush x:Key="PrInsetBg"      Color="{ThemeResource Omega.PanelColor}" />
+        <SolidColorBrush x:Key="PrFrameEdge"    Color="{ThemeResource Omega.PanelBorderColor}" />
+        <SolidColorBrush x:Key="PrTelemetryText" Color="{ThemeResource Omega.SubtleTextColor}" />
+
+        <Style x:Key="PrCard" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource Omega.PanelBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource Omega.PanelBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource Omega.PanelCorner}" />
+        </Style>
+
+        <Style x:Key="PrInner" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource Omega.PanelBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource Omega.PanelBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource Omega.PanelCorner}" />
+        </Style>
+
+        <Style x:Key="PrSectionLabel" TargetType="TextBlock" BasedOn="{StaticResource Omega.NameText}">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{ThemeResource Omega.SubtleTextBrush}" />
+        </Style>
+
+        <!-- The application's own buttons, so this page's read the same as
+             every other page's. -->
+        <Style x:Key="PrSubtle" TargetType="Button" />
+
+        <Style x:Key="PrChip" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource Omega.PanelBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource Omega.PanelBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource Omega.PillCorner}" />
+            <Setter Property="Padding" Value="10,4" />
+        </Style>
+
+        <!-- The corner brackets and the glowing top edge belong to the other
+             application's look. Kept as keys because the markup names them,
+             drawn as nothing. -->
+        <Style x:Key="PrCornerBracketTL" TargetType="Path">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+        <Style x:Key="PrCornerBracketTR" TargetType="Path">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+        <Style x:Key="PrCornerBracketBL" TargetType="Path">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+        <Style x:Key="PrCornerBracketBR" TargetType="Path">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+
+        <Style x:Key="PrTopEdgeGlow" TargetType="Border">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+    </Page.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*"
+          Background="{StaticResource PrPageBg}">
+
+        <omega:OmegaPageHeader Grid.Row="0"
+                                Title="Skill Recolor"
+                                Subtitle="Recolor a hero's skill effects">
+            <omega:OmegaPageHeader.RightContent>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <!-- This studio holds several game folders at once, so the
+                         one being read has to be said here. The page beneath is
+                         the original tool unchanged; picking a client just
+                         points it at that folder. -->
+                    <oas2:ClientSelector x:Name="ClientPicker" VerticalAlignment="Center" />
+
+                    <Button x:Name="ResetButton"
+                            Style="{StaticResource PrSubtle}"
+                            Click="ResetButton_Click"
+                            ToolTipService.ToolTip="Reset all sliders to neutral">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7A7;" FontSize="13" />
+                            <TextBlock Text="Reset" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </omega:OmegaPageHeader.RightContent>
+        </omega:OmegaPageHeader>
+
+
+
+        <Grid Grid.Row="2" Padding="14,10,14,12" ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <!-- HEROES (permanent left rail) | CONTENT (skills picker / colors) | CONTROLS (HSV sliders) -->
+                <ColumnDefinition Width="300" MinWidth="240" />
+                <ColumnDefinition Width="*" MinWidth="320" />
+                <ColumnDefinition Width="320" MinWidth="260" MaxWidth="380" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT RAIL: heroes always visible. Picking a hero swaps the
+                 middle column to show that hero's skills. -->
+            <Grid Grid.Column="0">
+            <Border Style="{StaticResource PrCard}" Padding="0">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <Border Style="{StaticResource PrTopEdgeGlow}" />
+                    <TextBlock Grid.Row="0" Padding="14,12,14,6"
+                               FontSize="10" FontWeight="SemiBold" CharacterSpacing="200" FontFamily="Cascadia Mono, Consolas"
+                               Foreground="{StaticResource PrArcCyan}"
+                               Text="◤ HEROES" />
+                    <ListView Grid.Row="1"
+                              x:Name="HeroRailListView"
+                              Margin="6,0,6,0"
+                              SelectionMode="Single"
+                              SelectionChanged="HeroRailListView_SelectionChanged">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="6,4" />
+                                <Setter Property="MinHeight" Value="0" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBox Grid.Row="2"
+                             x:Name="HeroRailFilterBox"
+                             Margin="8,4,8,8"
+                             PlaceholderText="Filter heroes..."
+                             TextChanged="HeroRailFilterBox_TextChanged" />
+                </Grid>
+            </Border>
+            <!-- HUD corner brackets — purely decorative target-reticle overlay -->
+            <Path Style="{StaticResource PrCornerBracketTL}" />
+            <Path Style="{StaticResource PrCornerBracketTR}" />
+            <Path Style="{StaticResource PrCornerBracketBL}" />
+            <Path Style="{StaticResource PrCornerBracketBR}" />
+            </Grid>
+
+            <!-- CONTENT: skills picker (when hero picked, no skill) OR colors (when skill picked).
+                 The legacy "Load a UPK" radios live here but are hidden because the page is now
+                 skill-first; the existing x:Name elements stay so all event handlers still resolve. -->
+            <Grid Grid.Column="1">
+            <Border Style="{StaticResource PrCard}" Padding="0">
+                <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+                    <Border Style="{StaticResource PrTopEdgeGlow}" Grid.RowSpan="5" />
+
+                    <!-- Mode radios are hidden — the page is now hero-skill first.
+                         Kept as collapsed elements so existing code-behind that
+                         references _modeIsHeroSkill via these radios still works. -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Padding="14,12,14,4"
+                                Visibility="Collapsed">
+                        <RadioButton x:Name="ModeByUpkRadio"
+                                     Content="Load a UPK"
+                                     GroupName="PrSourceMode"
+                                     Checked="ModeRadio_Checked" />
+                        <RadioButton x:Name="ModeBySkillRadio"
+                                     Content="Pick a hero skill"
+                                     GroupName="PrSourceMode"
+                                     Checked="ModeRadio_Checked" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" Padding="14,4,14,8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <!-- Back button — only visible while looking at the
+                             colors view of a chosen skill. Lets the user pick
+                             a different skill without backing all the way out
+                             to the hero rail. Wired to BackToSkillsButton_Click
+                             in the page code-behind. -->
+                        <Button x:Name="BackToSkillsButton"
+                                Grid.Column="0"
+                                Style="{StaticResource PrSubtle}"
+                                MinWidth="0"
+                                Padding="8,4"
+                                Visibility="Collapsed"
+                                VerticalAlignment="Center"
+                                Click="BackToSkillsButton_Click"
+                                ToolTipService.ToolTip="Back to skill list — pick a different skill for this hero.">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE72B;" FontSize="11" />
+                                <TextBlock Text="◀ SKILLS" FontSize="10" />
+                            </StackPanel>
+                        </Button>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock x:Name="CurrentUpkText" FontSize="13" FontWeight="SemiBold" Text="No UPK loaded" TextTrimming="CharacterEllipsis" />
+                            <TextBlock x:Name="CurrentSubText" FontSize="11" Opacity="0.6" Text="Load any UPK with material exports. For particle effects pick an Effects_*.upk; for costumes pick a character UPK."  TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <Border Style="{StaticResource PrChip}"
+                                    ToolTipService.ToolTip="Material Instance Constants found in this UPK. Each one is a tweakable material; the parameters below are grouped from these."><TextBlock x:Name="MicCountChip" FontSize="11" Text="0 materials" /></Border>
+                            <Border Style="{StaticResource PrChip}"
+                                    ToolTipService.ToolTip="Distinct Vector parameter names across all materials. Each group below tweaks one color across every material that uses that name."><TextBlock x:Name="GroupCountChip" FontSize="11" Text="0 colors" /></Border>
+                            <Border x:Name="ParticleSystemChip"
+                                    Style="{StaticResource PrChip}"
+                                    Visibility="Collapsed"
+                                    ToolTipService.ToolTip="Number of ParticleSystem exports in this UPK. If this is 0, the loaded UPK has no particle effects — what you're editing is regular material colors (costume, rim light, emissive, etc.)."><TextBlock x:Name="ParticleSystemChipText" FontSize="11" Text="0 particle systems" /></Border>
+                            <Border Style="{StaticResource PrChip}"><TextBlock x:Name="SelectedCountChip" FontSize="11" Text="0 selected" /></Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Grid.Row="2">
+                        <!-- Filter / All / None controls — hidden in simple-recolor mode.
+                             Kept as collapsed elements so existing event handlers compile. -->
+                        <Border Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBox x:Name="FilterBox" TextChanged="FilterBox_TextChanged" />
+                                <Button Click="SelectAllButton_Click" />
+                                <Button Click="SelectNoneButton_Click" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Visible Select All / Deselect All controls. Sit in the
+                             same Row 2 stack as the (collapsed) filter controls so
+                             they don't disturb the chip header row's auto-sizing. -->
+                        <StackPanel x:Name="SelectionToolsRow"
+                                    Orientation="Horizontal"
+                                    Spacing="6"
+                                    Padding="14,2,14,6">
+                            <Button x:Name="DeselectAllVisibleButton"
+                                    Content="Deselect All"
+                                    Padding="10,4" MinHeight="28"
+                                    Click="SelectNoneButton_Click"
+                                    ToolTipService.ToolTip="Uncheck every color slot in this skill. Useful before checking only the few you want to recolor." />
+                            <Button x:Name="SelectAllVisibleButton"
+                                    Content="Select All"
+                                    Padding="10,4" MinHeight="28"
+                                    Click="SelectAllButton_Click"
+                                    ToolTipService.ToolTip="Re-check every color slot in this skill." />
+                            <Button x:Name="GenerateRecolorReportButton"
+                                    Content="Generate Report"
+                                    Padding="10,4" MinHeight="28"
+                                    Click="GenerateRecolorReportButton_Click"
+                                    ToolTipService.ToolTip="Scan every hero / every skill and write a Markdown reference of every recolorable color slot — what it affects, current RGB, source UPK. Output: Desktop\OmegaAssetStudio_Docs\HeroSkillRecolorReference.md. Takes a few minutes to scan." />
+                            <TextBlock x:Name="ReportProgressText"
+                                       FontSize="11" Opacity="0.7" VerticalAlignment="Center"
+                                       Text="" />
+                        </StackPanel>
+
+                        <!-- Find effect by name — searches the cooked content index
+                             for any particle system / material whose name matches, so
+                             effects NOT bound to this power (secondary FX, auras,
+                             condition VFX) can still be surfaced and recolored. -->
+                        <Border x:Name="EffectSearchBar" Style="{StaticResource PrChip}"
+                                Padding="10,8" Margin="14,2,14,6" Visibility="Collapsed">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="FIND EXTRA EFFECT BY NAME" FontSize="10" FontWeight="SemiBold" Opacity="0.7" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                    <TextBox x:Name="EffectSearchBox" Grid.Column="0"
+                                             PlaceholderText="e.g. lightning, chain, flame, arc…"
+                                             KeyDown="EffectSearchBox_KeyDown" />
+                                    <Button x:Name="EffectSearchButton" Grid.Column="1"
+                                            Content="Search" Click="EffectSearchButton_Click" />
+                                </Grid>
+                                <TextBlock x:Name="EffectSearchHint" FontSize="10" Opacity="0.6" TextWrapping="Wrap"
+                                           Text="Lists THIS hero's other effect UPKs (combo/chain/secondary powers the skill triggers). Pick one to load its colors and recolor it — Some heroes route into multiple cross-package UPKs." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <Grid Grid.Row="3">
+                        <!-- VIEW 1 — parameter groups (active in both modes once
+                             materials are loaded; Hero Skills mode populates this
+                             from the resolved skill's referenced materials). -->
+                        <ScrollViewer x:Name="GroupsScrollView"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Padding="10">
+                            <StackPanel x:Name="GroupsContainer" Spacing="6" />
+                        </ScrollViewer>
+
+                        <!-- VIEW 2 — skill picker. Shown when a hero is picked but
+                             no skill yet. Heroes live in the new left rail; this
+                             panel only owns the skill list now. -->
+                        <Grid x:Name="HeroSkillPicker"
+                              Visibility="Collapsed"
+                              RowDefinitions="Auto,*,Auto">
+                            <Grid Grid.Row="0" Padding="14,10,14,6" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                <StackPanel Grid.Column="0" Spacing="2">
+                                    <TextBlock x:Name="SkillsHeroNameText"
+                                               FontSize="14" FontWeight="SemiBold"
+                                               Text="Pick a hero on the left" />
+                                    <TextBlock FontSize="11" FontWeight="SemiBold" CharacterSpacing="120" Opacity="0.55"
+                                               Text="SKILLS" />
+                                </StackPanel>
+                                <!-- Icon-load progress bubble. Red = nothing yet,
+                                     yellow = partial, green = all done. Mirrors the
+                                     ReadyStatusDot pattern Animation Preview uses
+                                     so the UX feels consistent across the suite. -->
+                                <Border Grid.Column="1"
+                                        x:Name="IconProgressBubble"
+                                        Padding="10,4"
+                                        CornerRadius="10"
+                                        Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                                        BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}"
+                                        BorderThickness="1"
+                                        VerticalAlignment="Center"
+                                        Visibility="Collapsed"
+                                        ToolTipService.ToolTip="Skill icons are loaded in the background — red = none yet, yellow = some, green = all done.">
+                                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                        <Ellipse x:Name="IconProgressDot" Width="8" Height="8" Fill="#D23C3C" />
+                                        <TextBlock x:Name="IconProgressText" FontSize="11" VerticalAlignment="Center" Text="Icons 0/0" />
+                                    </StackPanel>
+                                </Border>
+                                <Button Grid.Column="2"
+                                        x:Name="SkillsBackButton"
+                                        Style="{StaticResource PrSubtle}"
+                                        Click="SkillsBackButton_Click"
+                                        Visibility="Collapsed"
+                                        ToolTipService.ToolTip="Clear the current hero selection.">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE72B;" FontSize="11" />
+                                        <TextBlock Text="Clear hero" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                            <ListView Grid.Row="1"
+                                      x:Name="SkillListView"
+                                      Margin="10,0,10,0"
+                                      SelectionMode="Single"
+                                      SelectionChanged="SkillListView_SelectionChanged">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Padding" Value="8,6" />
+                                        <Setter Property="MinHeight" Value="0" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid ColumnDefinitions="68,*" ColumnSpacing="12">
+                                            <Border Grid.Column="0"
+                                                    Width="64" Height="64"
+                                                    CornerRadius="8"
+                                                    BorderThickness="1"
+                                                    BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}"
+                                                    Background="{ThemeResource OmegaAssetStudio.PanelSecondaryBrush}">
+                                                <Image Source="{Binding IconBitmap}"
+                                                       Stretch="Uniform"
+                                                       Margin="3" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding DisplayName}" />
+                                                <TextBlock Text="{Binding Subtitle}" FontSize="11" Opacity="0.6" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding Subtitle}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <TextBlock Grid.Row="2"
+                                       x:Name="SkillHintText"
+                                       Margin="14,6,14,10"
+                                       FontSize="10"
+                                       Opacity="0.6"
+                                       TextWrapping="Wrap"
+                                       Text="Pick a hero on the left to see their skills." />
+                        </Grid>
+
+                        <!-- Legacy named elements that other handlers reference,
+                             kept hidden so code compiles unchanged. -->
+                        <StackPanel Visibility="Collapsed">
+                            <ListView x:Name="HeroListView" SelectionChanged="HeroListView_SelectionChanged" />
+                            <TextBox x:Name="HeroFilterBox" TextChanged="HeroFilterBox_TextChanged" />
+                        </StackPanel>
+
+                        <StackPanel x:Name="GroupsSkeleton"
+                                    Margin="10"
+                                    Spacing="6"
+                                    Visibility="Collapsed"
+                                    IsHitTestVisible="False">
+                            <ctrls:Skeleton Height="52" />
+                            <ctrls:Skeleton Height="52" />
+                            <ctrls:Skeleton Height="52" />
+                            <ctrls:Skeleton Height="52" />
+                            <ctrls:Skeleton Height="52" />
+                            <ctrls:Skeleton Height="52" />
+                            <ctrls:Skeleton Height="52" />
+                            <ctrls:Skeleton Height="52" />
+                        </StackPanel>
+                        <ctrls:EmptyState x:Name="GroupsEmptyState"
+                                          Title="No UPK loaded"
+                                          Subtitle="Load any UPK with materials. We'll list every Vector color parameter we find, grouped by name."
+                                          Glyph="&#xE9D5;"
+                                          ActionText="Load UPK..."
+                                          ActionInvoked="GroupsEmptyState_ActionInvoked" />
+                    </Grid>
+
+                    <Border Grid.Row="4" Padding="14,8" BorderThickness="0,1,0,0" BorderBrush="{StaticResource PrArcCyanDim}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="6" Height="6" Fill="{StaticResource PrArcCyan}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="StatusText" FontSize="11" FontFamily="Cascadia Mono, Consolas"
+                                       Foreground="{StaticResource PrTelemetryText}" Text="// AWAITING UPK //" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+            <Path Style="{StaticResource PrCornerBracketTL}" />
+            <Path Style="{StaticResource PrCornerBracketTR}" />
+            <Path Style="{StaticResource PrCornerBracketBL}" />
+            <Path Style="{StaticResource PrCornerBracketBR}" />
+            </Grid>
+
+            <!-- RIGHT: shift controls -->
+            <Grid Grid.Column="2">
+            <Border Style="{StaticResource PrCard}" Padding="0">
+                <Grid>
+                <Border Style="{StaticResource PrTopEdgeGlow}" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="14">
+                    <StackPanel Spacing="16">
+
+                        <!-- SIMPLE RECOLOR — one color picker, one Apply, no per-slot dials.
+                             Behind the scenes the writer applies a brightness-preserving
+                             tint to every editable color slot the skill exposes (MIC params,
+                             Material expressions incl. Constant3/4Vector, and all three
+                             particle color distributions). One pick = the whole skill recolored. -->
+                        <StackPanel Spacing="14">
+
+                            <!-- BEFORE / AFTER pair — modders need to *see* what changes,
+                                 not just a single "current" swatch. The right swatch lives
+                                 inside the color picker, but a dedicated comparison row up
+                                 top tells the story at a glance. -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource PrSectionLabel}" Text="BEFORE / AFTER" Margin="0,0,0,2" />
+                                <Grid ColumnSpacing="8" ColumnDefinitions="*,*">
+                                    <StackPanel Grid.Column="0" Spacing="3">
+                                        <Border Height="64"
+                                                CornerRadius="6"
+                                                BorderThickness="1"
+                                                BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}">
+                                            <Border.Background>
+                                                <SolidColorBrush x:Name="PreviewBaseBrush" Color="#FF888888" />
+                                            </Border.Background>
+                                        </Border>
+                                        <TextBlock x:Name="PreviewBaseText" FontSize="10" Opacity="0.65" FontFamily="Cascadia Mono, Consolas" Text="—" TextAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="3">
+                                        <Border Height="64"
+                                                CornerRadius="6"
+                                                BorderThickness="1"
+                                                BorderBrush="{ThemeResource OmegaAssetStudio.PanelBorderBrush}">
+                                            <Border.Background>
+                                                <SolidColorBrush x:Name="PreviewAfterBrush" Color="#FFFFFFFF" />
+                                            </Border.Background>
+                                        </Border>
+                                        <TextBlock x:Name="PreviewAfterText" FontSize="10" Opacity="0.65" FontFamily="Cascadia Mono, Consolas" Text="—" TextAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- QUICK PRESETS — 12 hand-picked saturated hues for the most
+                                 common modder asks ("make it red", "make it gold"). Each
+                                 button just feeds the ColorPicker. -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource PrSectionLabel}" Text="QUICK PRESETS" />
+                                <VariableSizedWrapGrid x:Name="PresetWrap"
+                                                       Orientation="Horizontal"
+                                                       ItemHeight="32"
+                                                       ItemWidth="32"
+                                                       MaximumRowsOrColumns="6" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource PrSectionLabel}" Text="PICK A NEW COLOR" />
+                                <ColorPicker x:Name="NewColorPicker"
+                                             IsAlphaEnabled="False"
+                                             IsColorPreviewVisible="True"
+                                             IsColorSliderVisible="True"
+                                             IsColorChannelTextInputVisible="True"
+                                             IsHexInputVisible="True"
+                                             IsMoreButtonVisible="False"
+                                             ColorSpectrumShape="Box"
+                                             Color="#FFFFFFFF"
+                                             ColorChanged="NewColorPicker_ColorChanged" />
+                            </StackPanel>
+
+                            <!-- WHAT WILL CHANGE — color-kind breakdown. Each chip shows
+                                 "kind × count" so the modder knows the scope. -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource PrSectionLabel}" Text="WHAT WILL CHANGE" />
+                                <!-- Auto-sizing vertical list: each chip hugs its full label
+                                     so nothing is ever clipped (was a fixed 120px wrap grid). -->
+                                <StackPanel x:Name="BreakdownWrap" Spacing="4" />
+                                <TextBlock x:Name="BreakdownEmptyText" FontSize="11" Opacity="0.55" Text="Pick a skill to see what color slots it has." />
+                            </StackPanel>
+
+                            <!-- CROSS-PACKAGE WARNING — only visible when the skill's
+                                 particles point to shared materials living in other UPKs.
+                                 Recoloring those requires editing the shared UPK too. -->
+                            <Border x:Name="CrossPackageWarning"
+                                    Visibility="Collapsed"
+                                    Padding="10"
+                                    CornerRadius="4"
+                                    Background="#33E6C229"
+                                    BorderBrush="#FFE6C229"
+                                    BorderThickness="1">
+                                <!-- Grid (not horizontal StackPanel) so the text column is
+                                     width-constrained and actually wraps instead of clipping. -->
+                                <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*">
+                                    <FontIcon Grid.Column="0" FontFamily="Segoe Fluent Icons" Glyph="&#xE7BA;" FontSize="14" Foreground="#FFE6C229" VerticalAlignment="Top" />
+                                    <StackPanel Grid.Column="1" Spacing="3">
+                                        <TextBlock FontSize="11" FontWeight="SemiBold" Text="Shared material in another UPK" TextWrapping="Wrap" />
+                                        <!-- Names the specific shared material(s). -->
+                                        <TextBlock x:Name="CrossPackageMaterials" FontSize="10" FontWeight="SemiBold" Foreground="#FFE6C229" TextWrapping="Wrap" />
+                                        <TextBlock x:Name="CrossPackageDetail" FontSize="10" Opacity="0.85" TextWrapping="Wrap"
+                                                   Text="One or more particle emitters in this skill point to a material that lives in a different UPK." />
+                                        <!-- Read-only dry run: shows exactly what a "localize to this
+                                             hero" clone would copy, so the recolor only affects this
+                                             hero instead of every skill that shares the material. -->
+                                        <Button x:Name="LocalizePreviewButton" Margin="0,4,0,0"
+                                                Click="LocalizePreviewButton_Click"
+                                                ToolTipService.ToolTip="Preview the clone plan that would make these shared materials local to this hero (no files are changed).">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8C8;" FontSize="12" />
+                                                <TextBlock Text="Preview localize plan" FontSize="11" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock x:Name="ApplySummaryText" FontSize="11" Opacity="0.7" TextWrapping="Wrap"
+                                           Text="Pick a hero and a skill on the left to begin." />
+                                <Button x:Name="ApplyRecolorButton"
+                                        Style="{ThemeResource AccentButtonStyle}"
+                                        HorizontalAlignment="Stretch"
+                                        MinHeight="36"
+                                        IsEnabled="False"
+                                        Click="ApplyRecolorButton_Click"
+                                        ToolTipService.ToolTip="Recolor this skill. A backup of every affected UPK is made first.">
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74E;" FontSize="13" Foreground="White" />
+                                        <TextBlock Text="Apply &amp; save" FontWeight="SemiBold" Foreground="White" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="RestoreButton"
+                                        Style="{StaticResource PrSubtle}"
+                                        HorizontalAlignment="Stretch"
+                                        MinHeight="30"
+                                        IsEnabled="False"
+                                        Click="RestoreButton_Click"
+                                        ToolTipService.ToolTip="Restore every UPK touched by the last Apply from its .bak backup.">
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7A7;" FontSize="12" />
+                                        <TextBlock x:Name="RestoreButtonText" Text="Restore from backup" FontSize="12" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="InspectColorSourceButton"
+                                        Style="{StaticResource PrSubtle}"
+                                        HorizontalAlignment="Stretch"
+                                        MinHeight="30"
+                                        Click="InspectColorSourceButton_Click"
+                                        ToolTipService.ToolTip="Read-only: trace where a locked/parameterized color actually comes from (baked InstanceParameters vs UnrealScript).">
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE721;" FontSize="12" />
+                                        <TextBlock Text="Inspect color source" FontSize="12" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Legacy named UIElements that the old slider handlers reference.
+                             Hidden but kept so existing code-behind compiles unchanged. -->
+                        <StackPanel Visibility="Collapsed">
+                            <Slider x:Name="HueSlider" />
+                            <TextBlock x:Name="HueValueText" />
+                            <Slider x:Name="SatSlider" />
+                            <TextBlock x:Name="SatValueText" />
+                            <Slider x:Name="ValSlider" />
+                            <TextBlock x:Name="ValValueText" />
+                            <Slider x:Name="MulRSlider" />
+                            <TextBlock x:Name="MulRValueText" />
+                            <Slider x:Name="MulGSlider" />
+                            <TextBlock x:Name="MulGValueText" />
+                            <Slider x:Name="MulBSlider" />
+                            <TextBlock x:Name="MulBValueText" />
+                            <TextBlock x:Name="PreviewShiftedText" Text="—" />
+                            <Border>
+                                <Border.Background>
+                                    <SolidColorBrush x:Name="PreviewShiftedBrush" Color="#FF888888" />
+                                </Border.Background>
+                            </Border>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+                </Grid>
+            </Border>
+            <Path Style="{StaticResource PrCornerBracketTL}" />
+            <Path Style="{StaticResource PrCornerBracketTR}" />
+            <Path Style="{StaticResource PrCornerBracketBL}" />
+            <Path Style="{StaticResource PrCornerBracketBR}" />
+            </Grid>
+
+        </Grid>
+    </Grid>
+</Page>

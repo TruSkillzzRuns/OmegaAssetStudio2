@@ -1,0 +1,80 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1000000-0000-0000-0000-000000000001}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		CLAUDE.md = CLAUDE.md
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		global.json = global.json
+		LICENSE = LICENSE
+		README.md = README.md
+		THIRD_PARTY_NOTICES.txt = THIRD_PARTY_NOTICES.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D51EEF0A-D673-49DD-8173-21F9E1F91FCF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A1000000-0000-0000-0000-000000000002}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vendor", "vendor", "{7402E301-170C-483D-9FE7-68138BD3C333}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmegaAssetStudio2.App", "src\OmegaAssetStudio2.App\OmegaAssetStudio2.App.csproj", "{C3E36F59-0997-4F0E-86D6-3EFF43D08089}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmegaAssetStudio2.Core", "src\OmegaAssetStudio2.Core\OmegaAssetStudio2.Core.csproj", "{5DC7453E-675B-4BCD-8585-A094264AD819}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmegaAssetStudio2.Core.Tests", "tests\OmegaAssetStudio2.Core.Tests\OmegaAssetStudio2.Core.Tests.csproj", "{A1000000-0000-0000-0000-000000000003}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDSLib", "src\DDSLib\DDSLib.csproj", "{03291784-9DDD-471B-95D6-3981BE55E06A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager", "src\UpkManager\UpkManager.csproj", "{5FBAA8ED-0619-4ECF-BCE3-7BB4946DC67E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmegaAssetStudio2.CharacterSwap", "src\OmegaAssetStudio2.CharacterSwap\OmegaAssetStudio2.CharacterSwap.csproj", "{1F4E2C4A-9167-471E-8C45-7BC4654DB688}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3E36F59-0997-4F0E-86D6-3EFF43D08089}.Debug|x64.ActiveCfg = Debug|x64
+		{C3E36F59-0997-4F0E-86D6-3EFF43D08089}.Debug|x64.Build.0 = Debug|x64
+		{C3E36F59-0997-4F0E-86D6-3EFF43D08089}.Release|x64.ActiveCfg = Release|x64
+		{C3E36F59-0997-4F0E-86D6-3EFF43D08089}.Release|x64.Build.0 = Release|x64
+		{5DC7453E-675B-4BCD-8585-A094264AD819}.Debug|x64.ActiveCfg = Debug|x64
+		{5DC7453E-675B-4BCD-8585-A094264AD819}.Debug|x64.Build.0 = Debug|x64
+		{5DC7453E-675B-4BCD-8585-A094264AD819}.Release|x64.ActiveCfg = Release|x64
+		{5DC7453E-675B-4BCD-8585-A094264AD819}.Release|x64.Build.0 = Release|x64
+		{A1000000-0000-0000-0000-000000000003}.Debug|x64.ActiveCfg = Debug|x64
+		{A1000000-0000-0000-0000-000000000003}.Debug|x64.Build.0 = Debug|x64
+		{A1000000-0000-0000-0000-000000000003}.Release|x64.ActiveCfg = Release|x64
+		{A1000000-0000-0000-0000-000000000003}.Release|x64.Build.0 = Release|x64
+		{03291784-9DDD-471B-95D6-3981BE55E06A}.Debug|x64.ActiveCfg = Debug|x64
+		{03291784-9DDD-471B-95D6-3981BE55E06A}.Debug|x64.Build.0 = Debug|x64
+		{03291784-9DDD-471B-95D6-3981BE55E06A}.Release|x64.ActiveCfg = Release|x64
+		{03291784-9DDD-471B-95D6-3981BE55E06A}.Release|x64.Build.0 = Release|x64
+		{5FBAA8ED-0619-4ECF-BCE3-7BB4946DC67E}.Debug|x64.ActiveCfg = Debug|x64
+		{5FBAA8ED-0619-4ECF-BCE3-7BB4946DC67E}.Debug|x64.Build.0 = Debug|x64
+		{5FBAA8ED-0619-4ECF-BCE3-7BB4946DC67E}.Release|x64.ActiveCfg = Release|x64
+		{5FBAA8ED-0619-4ECF-BCE3-7BB4946DC67E}.Release|x64.Build.0 = Release|x64
+		{1F4E2C4A-9167-471E-8C45-7BC4654DB688}.Debug|x64.ActiveCfg = Debug|x64
+		{1F4E2C4A-9167-471E-8C45-7BC4654DB688}.Debug|x64.Build.0 = Debug|x64
+		{1F4E2C4A-9167-471E-8C45-7BC4654DB688}.Release|x64.ActiveCfg = Release|x64
+		{1F4E2C4A-9167-471E-8C45-7BC4654DB688}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C3E36F59-0997-4F0E-86D6-3EFF43D08089} = {D51EEF0A-D673-49DD-8173-21F9E1F91FCF}
+		{5DC7453E-675B-4BCD-8585-A094264AD819} = {D51EEF0A-D673-49DD-8173-21F9E1F91FCF}
+		{A1000000-0000-0000-0000-000000000003} = {A1000000-0000-0000-0000-000000000002}
+		{03291784-9DDD-471B-95D6-3981BE55E06A} = {D51EEF0A-D673-49DD-8173-21F9E1F91FCF}
+		{5FBAA8ED-0619-4ECF-BCE3-7BB4946DC67E} = {D51EEF0A-D673-49DD-8173-21F9E1F91FCF}
+		{1F4E2C4A-9167-471E-8C45-7BC4654DB688} = {D51EEF0A-D673-49DD-8173-21F9E1F91FCF}
+	EndGlobalSection
+EndGlobal

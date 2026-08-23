@@ -1,0 +1,317 @@
+<Page
+    x:Class="OmegaAssetStudio2.App.Pages.MeshPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:OmegaAssetStudio2.App.Controls"
+    xmlns:pages="using:OmegaAssetStudio2.App.Pages">
+
+    <Grid Padding="{StaticResource Omega.PagePadding}" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="10">
+            <controls:ToolHeader
+                Title="Mesh"
+                Subtitle="Pick a character to see its model, or search every package for one." />
+            <controls:ClientSelector x:Name="ClientPicker" HorizontalAlignment="Left" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" MinWidth="260" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="320" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="340" MinWidth="300" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Who to look at -->
+            <Border Grid.Column="0"
+                    Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="10">
+                <Grid RowSpacing="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- No item is selected here on purpose. Selecting one in
+                         markup raises SelectionChanged while the page is still
+                         being built, before the controls below exist. The first
+                         category is chosen in code once the page has loaded. -->
+                    <ComboBox x:Name="CategoryPicker" Grid.Row="0"
+                              HorizontalAlignment="Stretch"
+                              Header="Show"
+                              SelectionChanged="CategoryPicker_SelectionChanged">
+                        <ComboBoxItem Content="Heroes" />
+                        <ComboBoxItem Content="Team-Ups" />
+                        <ComboBoxItem Content="Bosses" />
+                        <ComboBoxItem Content="Enemies" />
+                        <ComboBoxItem Content="Every package" />
+                    </ComboBox>
+
+                    <TextBox x:Name="SearchBox" Grid.Row="1"
+                             PlaceholderText="Search by name"
+                             TextChanged="SearchBox_TextChanged" />
+
+                    <StackPanel x:Name="ScanControls" Grid.Row="2"
+                                Orientation="Horizontal" Spacing="8"
+                                Visibility="Collapsed">
+                        <Button x:Name="ScanButton" Content="Find models" Click="ScanButton_Click" />
+                        <Button x:Name="CancelButton" Content="Stop" IsEnabled="False" Click="CancelButton_Click" />
+                    </StackPanel>
+
+                    <!-- Both events are handled: selection covers moving through
+                         the list with the keyboard, and item click covers
+                         clicking the row that is already selected, which
+                         otherwise does nothing at all. -->
+                    <ListView x:Name="RosterList" Grid.Row="3" SelectionMode="Single"
+                              IsItemClickEnabled="True"
+                              ItemClick="RosterList_ItemClick"
+                              SelectionChanged="RosterList_SelectionChanged"
+                              ItemContainerStyle="{StaticResource Omega.ListRow}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="pages:RosterRow">
+                                <!-- Transparent rather than unpainted: an
+                                     unpainted area is not hit-testable, so the
+                                     gap between the two lines of text would
+                                     swallow clicks. -->
+                                <StackPanel Padding="2,8,2,8" Spacing="2"
+                                            HorizontalAlignment="Stretch"
+                                            Background="Transparent">
+                                    <TextBlock Text="{x:Bind Name}"
+                                               Style="{StaticResource Omega.RowText}"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap" />
+                                    <TextBlock Text="{x:Bind Detail}"
+                                               Style="{StaticResource Omega.RowText}"
+                                               FontSize="12"
+                                               TextWrapping="Wrap"
+                                               Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <TextBlock x:Name="CountText" Grid.Row="4"
+                               Style="{StaticResource Omega.PageSubtitle}"
+                               TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+
+            <controls:PanelSplitter Grid.Column="1" />
+
+            <!-- The model itself -->
+            <Border Grid.Column="2"
+                    Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Padding="10,10,10,8" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MinWidth="120" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox x:Name="ModelPicker" Grid.Column="0"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Models in this package"
+                                  SelectionChanged="ModelPicker_SelectionChanged" />
+
+                        <ComboBox x:Name="DetailPicker" Grid.Column="1"
+                                  MinWidth="120"
+                                  PlaceholderText="Detail"
+                                  SelectionChanged="DetailPicker_SelectionChanged" />
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                            <!-- What the model stands on. Wide enough for a
+                                 chosen file's name to read in full. -->
+                            <ComboBox x:Name="StandPicker"
+                                      MinWidth="150"
+                                      PlaceholderText="No stand"
+                                      SelectionChanged="StandPicker_SelectionChanged"
+                                      ToolTipService.ToolTip="Stand the model on a platform of your own. Choose any model file; its colour, normal, roughness and metallic maps are picked up from beside it." />
+                            <!-- The light the stand throws. Its own picker so
+                                 the platform and what it projects can be
+                                 chosen apart from one another. -->
+                            <ComboBox x:Name="ProjectionPicker"
+                                      MinWidth="130"
+                                      SelectionChanged="ProjectionPicker_SelectionChanged"
+                                      ToolTipService.ToolTip="What the platform projects around the model. Nothing to do with the game's own materials — the model itself is shaded the same way whichever is chosen.">
+                                <ComboBoxItem Content="No light" />
+                                <ComboBoxItem Content="Beam" />
+                                <ComboBoxItem Content="Rings" />
+                                <ComboBoxItem Content="Scan" />
+                                <ComboBoxItem Content="Cage" />
+                                <ComboBoxItem Content="Column" />
+                                <ComboBoxItem Content="Spiral" />
+                                <ComboBoxItem Content="Lattice" />
+                                <ComboBoxItem Content="Motes" />
+                                <ComboBoxItem Content="Glitch" />
+                                <ComboBoxItem Content="Plasma" />
+                                <ComboBoxItem Content="Embers" />
+                                <ComboBoxItem Content="Dissolve" />
+                                <ComboBoxItem Content="Dome" />
+                            </ComboBox>
+                            <ToggleButton x:Name="TextureToggle" Content="Textures"
+                                          IsChecked="True" Click="TextureToggle_Click" />
+                            <Button x:Name="ExportButton" IsEnabled="False"
+                                    Content="Export…" Click="ExportButton_Click"
+                                    ToolTipService.ToolTip="Saves the model shown, with its skeleton and skin weights, to a file a modelling tool can open. Bring it back through Retarget to put an edited version into the game." />
+                            <Button x:Name="ResetViewButton"
+                                    Content="Reset view" Click="ResetViewButton_Click" />
+                        </StackPanel>
+                    </Grid>
+
+                    <SwapChainPanel x:Name="Viewport" Grid.Row="1"
+                                    SizeChanged="Viewport_SizeChanged"
+                                    PointerPressed="Viewport_PointerPressed"
+                                    PointerMoved="Viewport_PointerMoved"
+                                    PointerReleased="Viewport_PointerReleased"
+                                    PointerCaptureLost="Viewport_PointerReleased"
+                                    PointerWheelChanged="Viewport_PointerWheelChanged" />
+
+                    <TextBlock x:Name="ViewportMessage" Grid.Row="1"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Margin="24"
+                               TextAlignment="Center" TextWrapping="Wrap"
+                               Style="{StaticResource Omega.NameText}"
+                               Text="Pick a character on the left." />
+
+                    <!-- Zoom, over the viewport rather than up in the header:
+                         it belongs with the thing it moves, and the header row
+                         has to keep every one of its labels readable at a small
+                         window size. -->
+                    <Border Grid.Row="1"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Margin="0,0,14,14" Padding="4"
+                            CornerRadius="8"
+                            Background="{ThemeResource Omega.PanelBrush}"
+                            BorderThickness="1"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}">
+                        <StackPanel Orientation="Vertical" Spacing="4">
+                            <Button x:Name="ZoomInButton" Width="36" Height="32"
+                                    Click="ZoomInButton_Click"
+                                    ToolTipService.ToolTip="Zoom in (or scroll the wheel)">
+                                <FontIcon Glyph="&#xE8A3;" FontSize="15" />
+                            </Button>
+                            <Button x:Name="ZoomOutButton" Width="36" Height="32"
+                                    Click="ZoomOutButton_Click"
+                                    ToolTipService.ToolTip="Zoom out (or scroll the wheel)">
+                                <FontIcon Glyph="&#xE71F;" FontSize="15" />
+                            </Button>
+                            <Button x:Name="ZoomFitButton" Width="36" Height="32"
+                                    Click="ResetViewButton_Click"
+                                    ToolTipService.ToolTip="Fit the whole model in view">
+                                <FontIcon Glyph="&#xE9A6;" FontSize="15" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Grid.Row="2" Padding="10,6,10,10"
+                               Style="{StaticResource Omega.PageSubtitle}"
+                               TextWrapping="Wrap"
+                               Text="Drag to turn the model. Right-drag to slide it. Scroll, or use the buttons, to move closer." />
+                </Grid>
+            </Border>
+
+            <controls:PanelSplitter Grid.Column="3" />
+
+            <!-- What the file says about it -->
+            <ScrollViewer Grid.Column="4">
+                <StackPanel Spacing="12">
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="6">
+                            <TextBlock x:Name="DetailName"
+                                       Style="{StaticResource Omega.NameText}"
+                                       FontSize="16" FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       Text="Nothing selected" />
+                            <TextBlock x:Name="DetailPath" Style="{StaticResource Omega.NameText}" FontSize="12"
+                                       TextWrapping="Wrap" IsTextSelectionEnabled="True"
+                                       Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Geometry" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailGeometry" Style="{StaticResource Omega.NameText}"
+                                       FontFamily="Consolas" FontSize="12"
+                                       TextWrapping="Wrap" Text="—" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Size and shape" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailBounds" Style="{StaticResource Omega.NameText}"
+                                       FontFamily="Consolas" FontSize="12"
+                                       TextWrapping="Wrap" Text="—" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Materials" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailMaterials" Style="{StaticResource Omega.NameText}"
+                                       FontSize="12" TextWrapping="Wrap" Text="—" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="{ThemeResource Omega.PanelBrush}"
+                BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Omega.PanelCorner}"
+                Padding="12,10,12,10">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" Style="{StaticResource Omega.NameText}"
+                           VerticalAlignment="Center" TextWrapping="Wrap"
+                           Text="Pick a game above, then choose a character." />
+                <ProgressBar x:Name="ScanBar" Grid.Column="1" Width="200"
+                             VerticalAlignment="Center" Visibility="Collapsed" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

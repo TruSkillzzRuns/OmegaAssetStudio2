@@ -1,0 +1,156 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>OmegaAssetStudio2.App</RootNamespace>
+    <AssemblyName>OmegaAssetStudio2</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>false</EnableMsixTooling>
+    <WindowsPackageType>None</WindowsPackageType>
+    <EnablePriGenTooling>false</EnablePriGenTooling>
+    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <ApplicationIcon>Assets\OmegaAssetStudio2.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>$(NoWarn);NU1900</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+    <!-- Versions live in Directory.Packages.props. -->
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Vortice.Mathematics" />
+    <PackageReference Include="Vortice.Direct3D11" />
+    <PackageReference Include="Vortice.D3DCompiler" />
+    <PackageReference Include="Vortice.DXGI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OmegaAssetStudio2.Core\OmegaAssetStudio2.Core.csproj" />
+    <ProjectReference Include="..\OmegaAssetStudio2.Calligraphy\OmegaAssetStudio2.Calligraphy.csproj" />
+    <ProjectReference Include="..\OmegaAssetStudio2.CharacterSwap\OmegaAssetStudio2.CharacterSwap.csproj" />
+
+    <!--
+      Checks the viewport's shading. Referenced only so that it is built before
+      the check runs; nothing here uses its types.
+    -->
+    <ProjectReference Include="..\OmegaAssetStudio2.RenderChecks\OmegaAssetStudio2.RenderChecks.csproj"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- License obligations. These must ship next to the exe in every build;
+         see THIRD_PARTY_NOTICES.txt for the per-component requirements. -->
+    <Content Include="..\..\LICENSE">
+      <Link>LICENSE.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\THIRD_PARTY_NOTICES.txt">
+      <Link>THIRD_PARTY_NOTICES.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\OmegaAssetStudio2.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\OmegaLogo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\OmegaBanner.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\OmegaMark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <!-- The audio decoder vgmstream is deliberately NOT shipped. It bundles
+         codec libraries under several licences, one of them from a standards
+         body whose terms are not a recognised open-source licence, and passing
+         all of that on is an obligation this project has no reason to take.
+         The Voice Swapper points the user at the download instead and
+         remembers where they put it. -->
+  </ItemGroup>
+
+  <!--
+    The Windows App SDK copies its translated interface strings for 86
+    languages, one folder of .mui files each, none of which this application
+    asks for. Keep the four that are wanted and drop the rest after every
+    build, so the output folder stays something a person can read.
+
+    Matched on the language part of the folder name, so regional variants come
+    along: en-GB and en-us, es-ES and es-MX.
+  -->
+  <PropertyGroup>
+    <KeptInterfaceLanguages>en-;es-;ja-;ru-</KeptInterfaceLanguages>
+  </PropertyGroup>
+
+  <Target Name="TrimInterfaceLanguages" AfterTargets="Build">
+    <ItemGroup>
+      <_TranslatedFile Include="$(OutDir)*\*.mui" />
+      <_TranslatedFolder Include="@(_TranslatedFile->'%(RelativeDir)')" />
+    </ItemGroup>
+
+    <RemoveDuplicates Inputs="@(_TranslatedFolder)">
+      <Output TaskParameter="Filtered" ItemName="_LanguageFolder" />
+    </RemoveDuplicates>
+
+    <ItemGroup>
+      <_UnwantedLanguage Include="@(_LanguageFolder)" Condition="
+        !$([System.String]::new('%(Identity)').ToLowerInvariant().Contains('\en-')) AND
+        !$([System.String]::new('%(Identity)').ToLowerInvariant().Contains('\es-')) AND
+        !$([System.String]::new('%(Identity)').ToLowerInvariant().Contains('\ja-')) AND
+        !$([System.String]::new('%(Identity)').ToLowerInvariant().Contains('\ru-'))" />
+    </ItemGroup>
+
+    <RemoveDir Directories="@(_UnwantedLanguage)" ContinueOnError="true" />
+
+    <Message Importance="normal"
+             Text="Interface languages: kept $(KeptInterfaceLanguages), removed @(_UnwantedLanguage->Count()) other folder(s)." />
+  </Target>
+
+  <!--
+    Workaround for a WindowsAppSDK XamlCompiler bug: it writes .g.cs files into
+    OutputPath\<page-subdir>\ without creating the subdirectory first, then
+    exits 1 with no useful message. Pre-create every XAML page's output dir.
+  -->
+  <Target Name="PreCreateXamlOutputDirs" BeforeTargets="MarkupCompilePass1">
+    <PropertyGroup>
+      <_XamlOutputRoot>$(IntermediateOutputPath)$(TargetFramework)\$(RuntimeIdentifier)\</_XamlOutputRoot>
+    </PropertyGroup>
+    <ItemGroup>
+      <_XamlPageDirs Include="@(Page->'$(_XamlOutputRoot)%(RelativeDir)')" />
+      <_XamlAppDirs Include="@(ApplicationDefinition->'$(_XamlOutputRoot)%(RelativeDir)')" />
+      <_XamlPageDirsAlt Include="@(Page->'$(IntermediateOutputPath)%(RelativeDir)')" />
+      <_XamlAppDirsAlt Include="@(ApplicationDefinition->'$(IntermediateOutputPath)%(RelativeDir)')" />
+    </ItemGroup>
+    <MakeDir Directories="@(_XamlPageDirs);@(_XamlAppDirs);@(_XamlPageDirsAlt);@(_XamlAppDirsAlt)" />
+  </Target>
+
+  <!--
+    Runs the shading checks after every build of the viewport.
+
+    They fail the build rather than warn, because everything they look for has
+    already reached a screen once: a constant group padded short, which shifted
+    every channel selector after it and washed the colour out of costumes, and a
+    shader that would not compile because a variable was named after a reserved
+    word, which left the ground simply not drawing. Neither showed up as an
+    error anywhere else.
+  -->
+  <Target Name="CheckShading" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <PropertyGroup>
+      <ShadingChecker>$(MSBuildThisFileDirectory)..\OmegaAssetStudio2.RenderChecks\bin\$(Platform)\$(Configuration)\net8.0-windows\OmegaAssetStudio2.RenderChecks.exe</ShadingChecker>
+    </PropertyGroup>
+
+    <Exec Command="&quot;$(ShadingChecker)&quot; &quot;$(MSBuildThisFileDirectory.TrimEnd('\'))&quot;"
+          Condition="Exists('$(ShadingChecker)')"
+          ContinueOnError="false" />
+  </Target>
+
+</Project>

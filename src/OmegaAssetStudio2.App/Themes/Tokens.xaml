@@ -1,0 +1,182 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        One place for the values every page reuses. Pages must not hard-code
+        colours, paddings, or font sizes; if something is missing here, add it
+        here rather than inline, so a theme change stays a one-file change.
+    -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Default">
+            <Color x:Key="Omega.AccentColor">#FFB258FF</Color>
+            <SolidColorBrush x:Key="Omega.AccentBrush" Color="{StaticResource Omega.AccentColor}" />
+            <!-- Named as colours as well as brushes, because a page that
+                 builds a brush of its own - a wash, a tint, something at part
+                 opacity - needs the colour rather than the brush. -->
+            <Color x:Key="Omega.PanelColor">#FF1B1922</Color>
+            <Color x:Key="Omega.PanelBorderColor">#FF3B3348</Color>
+            <Color x:Key="Omega.SubtleTextColor">#FFA9A3B7</Color>
+
+            <SolidColorBrush x:Key="Omega.PanelBrush" Color="{StaticResource Omega.PanelColor}" />
+            <SolidColorBrush x:Key="Omega.PanelBorderBrush" Color="{StaticResource Omega.PanelBorderColor}" />
+            <SolidColorBrush x:Key="Omega.SubtleTextBrush" Color="{StaticResource Omega.SubtleTextColor}" />
+
+            <!--
+                The names the copied Skill Recolor markup asks for. It was taken
+                across from the first studio unedited, and it names its brushes
+                the way that application does; answering to those names here is
+                what lets the copy stay a copy. They are this application's own
+                colours, so the page follows the theme like everything else.
+            -->
+            <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FF1B1922" />
+            <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FF24202E" />
+            <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FF3B3348" />
+            <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="{StaticResource Omega.AccentColor}" />
+
+            <!--
+                State colours. A list of files is read by scanning down it, so
+                what has changed has to be findable without reading a word of
+                it. Each state gets a text colour and a wash behind it, the wash
+                being the same colour at low opacity so the pair always agree.
+            -->
+            <Color x:Key="Omega.ChangedColor">#FFCC4B45</Color>
+            <Color x:Key="Omega.SafeColor">#FF4FBF7B</Color>
+            <Color x:Key="Omega.GoneColor">#FFCC4B45</Color>
+
+            <!--
+                A picked row has to be obvious at a glance. The shipped
+                highlight is a few percent lighter than the panel behind it,
+                which against this dark background cannot be seen at all — so a
+                user has no way of telling what they have chosen.
+            -->
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelected"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.30" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.40" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPressed"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.48" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.12" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundPressed"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.22" />
+        
+            <SolidColorBrush x:Key="Omega.ChangedBrush" Color="{StaticResource Omega.ChangedColor}" />
+            <SolidColorBrush x:Key="Omega.ChangedWash" Color="{StaticResource Omega.ChangedColor}" Opacity="0.12" />
+            <SolidColorBrush x:Key="Omega.SafeBrush" Color="{StaticResource Omega.SafeColor}" />
+            <SolidColorBrush x:Key="Omega.SafeWash" Color="{StaticResource Omega.SafeColor}" Opacity="0.10" />
+            <SolidColorBrush x:Key="Omega.GoneBrush" Color="{StaticResource Omega.GoneColor}" />
+            <SolidColorBrush x:Key="Omega.GoneWash" Color="{StaticResource Omega.GoneColor}" Opacity="0.12" />
+            <SolidColorBrush x:Key="Omega.AccentWash" Color="{StaticResource Omega.AccentColor}" Opacity="0.12" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <Color x:Key="Omega.AccentColor">#FF7A26C9</Color>
+            <SolidColorBrush x:Key="Omega.AccentBrush" Color="{StaticResource Omega.AccentColor}" />
+            <Color x:Key="Omega.PanelColor">#FFF7F5FB</Color>
+            <Color x:Key="Omega.PanelBorderColor">#FFDCD4E7</Color>
+            <Color x:Key="Omega.SubtleTextColor">#FF5B5369</Color>
+
+            <SolidColorBrush x:Key="Omega.PanelBrush" Color="{StaticResource Omega.PanelColor}" />
+            <SolidColorBrush x:Key="Omega.PanelBorderBrush" Color="{StaticResource Omega.PanelBorderColor}" />
+            <SolidColorBrush x:Key="Omega.SubtleTextBrush" Color="{StaticResource Omega.SubtleTextColor}" />
+
+            <!--
+                The names the copied Skill Recolor markup asks for. It was taken
+                across from the first studio unedited, and it names its brushes
+                the way that application does; answering to those names here is
+                what lets the copy stay a copy. They are this application's own
+                colours, so the page follows the theme like everything else.
+            -->
+            <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FFF7F5FB" />
+            <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FFEFEAF7" />
+            <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FFDCD4E7" />
+            <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="{StaticResource Omega.AccentColor}" />
+
+            <Color x:Key="Omega.ChangedColor">#FFB3261E</Color>
+            <Color x:Key="Omega.SafeColor">#FF1E7F4D</Color>
+            <Color x:Key="Omega.GoneColor">#FFB3261E</Color>
+
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelected"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.22" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.30" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPressed"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.36" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.10" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundPressed"
+                             Color="{StaticResource Omega.AccentColor}" Opacity="0.16" />
+        
+            <SolidColorBrush x:Key="Omega.ChangedBrush" Color="{StaticResource Omega.ChangedColor}" />
+            <SolidColorBrush x:Key="Omega.ChangedWash" Color="{StaticResource Omega.ChangedColor}" Opacity="0.12" />
+            <SolidColorBrush x:Key="Omega.SafeBrush" Color="{StaticResource Omega.SafeColor}" />
+            <SolidColorBrush x:Key="Omega.SafeWash" Color="{StaticResource Omega.SafeColor}" Opacity="0.10" />
+            <SolidColorBrush x:Key="Omega.GoneBrush" Color="{StaticResource Omega.GoneColor}" />
+            <SolidColorBrush x:Key="Omega.GoneWash" Color="{StaticResource Omega.GoneColor}" Opacity="0.12" />
+            <SolidColorBrush x:Key="Omega.AccentWash" Color="{StaticResource Omega.AccentColor}" Opacity="0.12" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <Thickness x:Key="Omega.PagePadding">24,20,24,20</Thickness>
+    <Thickness x:Key="Omega.PanelPadding">16</Thickness>
+    <CornerRadius x:Key="Omega.PanelCorner">8</CornerRadius>
+    <CornerRadius x:Key="Omega.PillCorner">11</CornerRadius>
+    <x:Double x:Key="Omega.TitleSize">28</x:Double>
+    <x:Double x:Key="Omega.SubtitleSize">14</x:Double>
+
+    <!--
+        Readability rule: names must never be clipped. Any TextBlock that shows a
+        thing the user has to read in full (asset name, material name, file name,
+        button label) uses this style. It wraps instead of trimming, at every
+        window size. Do not add TextTrimming to it.
+    -->
+    <Style x:Key="Omega.NameText" TargetType="TextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="IsTextSelectionEnabled" Value="True" />
+    </Style>
+
+    <!--
+        The same, for text inside a row of a list.
+        It differs from Omega.NameText in one respect: the text cannot be
+        selected. A TextBlock that allows selection takes the pointer for
+        itself, so a click on the name never reaches the row underneath it —
+        which left every list in the application selectable only by clicking the
+        thin strip of padding to the left of its text. Names in a list are read,
+        not copied; the panel beside the list is where they can be copied from.
+    -->
+    <Style x:Key="Omega.RowText" TargetType="TextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="IsTextSelectionEnabled" Value="False" />
+    </Style>
+
+    <Style x:Key="Omega.PageTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource Omega.TitleSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="Omega.PageSubtitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource Omega.SubtitleSize}" />
+        <Setter Property="Foreground" Value="{ThemeResource Omega.SubtleTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!--
+        Every row in every list uses this. Without it a row's content is only as
+        wide as its text, so clicking beside a name does nothing and the row has
+        to be hit on its first few characters. The whole width of a row should
+        select it, which is what stretching the content gives.
+    -->
+    <Style x:Key="Omega.ListRow" TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="12,2,12,2" />
+    </Style>
+
+    <!-- The same, for lists that lay their rows out in a grid. -->
+    <Style x:Key="Omega.GridCell" TargetType="GridViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+
+</ResourceDictionary>

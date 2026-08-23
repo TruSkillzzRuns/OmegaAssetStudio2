@@ -1,0 +1,36 @@
+﻿<Application
+    x:Class="OmegaAssetStudio2.App.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="ms-appx:///Themes/Tokens.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--
+                The copied Skill Recolor page looks its brushes up at runtime,
+                by asking the application for its Dark theme dictionary by name.
+                That page and the others like it are drawn dark whatever the
+                system is set to, so the dictionary it asks for is provided here
+                rather than editing the copy to ask differently.
+            -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FF1E1F24" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FF26272E" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FF33353D" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FF6BB8FF" />
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FF1E1F24" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FF26272E" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FF33353D" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FF6BB8FF" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

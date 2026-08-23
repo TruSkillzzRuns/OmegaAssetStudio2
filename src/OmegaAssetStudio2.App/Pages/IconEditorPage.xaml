@@ -1,0 +1,270 @@
+<Page
+    x:Class="OmegaAssetStudio2.App.Pages.IconEditorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:OmegaAssetStudio2.App.Controls"
+    xmlns:pages="using:OmegaAssetStudio2.App.Pages"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls">
+
+    <Grid Padding="{StaticResource Omega.PagePadding}" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="10">
+            <controls:ToolHeader
+                Title="Icon Editor"
+                Subtitle="Find an icon, see it, and check exactly what it is." />
+            <controls:ClientSelector x:Name="ClientPicker" HorizontalAlignment="Left" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="180" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="ScanButton" Grid.Column="0" Content="Scan for icons" Click="ScanButton_Click" />
+            <Button x:Name="CancelButton" Grid.Column="1" Content="Stop" IsEnabled="False" Click="CancelButton_Click" />
+
+            <TextBox x:Name="SearchBox" Grid.Column="2"
+                     PlaceholderText="Search by name or package"
+                     TextChanged="SearchBox_TextChanged" />
+
+            <TextBlock x:Name="CountText" Grid.Column="3" VerticalAlignment="Center"
+                       Style="{StaticResource Omega.PageSubtitle}" />
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="CategoryColumn" Width="300" MinWidth="240" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="360" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="400" MinWidth="340" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Categories. The names are the point of this panel, so it is
+                 wide, resizable, and lets a long name wrap instead of
+                 cutting it off. -->
+            <Border Grid.Column="0"
+                    Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}">
+                <Grid RowSpacing="8" Padding="12,12,6,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Categories" FontWeight="SemiBold" />
+
+                    <Button Grid.Row="1"
+                            x:Name="ShowAllButton"
+                            Content="Show every icon"
+                            HorizontalAlignment="Stretch"
+                            IsEnabled="False"
+                            Click="ShowAllButton_Click" />
+
+                    <TreeView Grid.Row="2"
+                              x:Name="CategoryTree"
+                              SelectionMode="Single"
+                              CanDragItems="False"
+                              CanReorderItems="False"
+                              AllowDrop="False"
+                              SelectionChanged="CategoryTree_SelectionChanged">
+                        <TreeView.ItemTemplate>
+                            <!-- The tree hands the template its own node, so
+                                 the category is reached through Content. -->
+                            <DataTemplate x:DataType="muxc:TreeViewNode">
+                                <Grid ColumnSpacing="8" Margin="0,2,0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{x:Bind ((pages:CategoryNode)Content).Title}"
+                                               Style="{StaticResource Omega.RowText}"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{x:Bind ((pages:CategoryNode)Content).CountLabel}"
+                                               FontSize="12"
+                                               VerticalAlignment="Center"
+                                               Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                                </Grid>
+                            </DataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Grid>
+            </Border>
+
+            <controls:PanelSplitter x:Name="CategorySplitter" Grid.Column="1" />
+
+            <Border Grid.Column="2"
+                    Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}">
+                <GridView x:Name="IconGrid"
+                          Padding="12"
+                          SelectionMode="Single"
+                          IsItemClickEnabled="False"
+                          ItemContainerStyle="{StaticResource Omega.GridCell}"
+                          SelectionChanged="IconGrid_SelectionChanged"
+                          ContainerContentChanging="IconGrid_ContainerContentChanging">
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="pages:IconCard">
+                            <Grid Width="150" Height="176" Padding="6" RowSpacing="6">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="96" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Border Grid.Row="0" CornerRadius="6"
+                                        Background="{ThemeResource Omega.PanelBorderBrush}">
+                                    <Grid>
+                                        <Image Source="{x:Bind Thumbnail, Mode=OneWay}"
+                                               Stretch="Uniform" Margin="6" />
+                                        <TextBlock Text="{x:Bind PlaceholderGlyph, Mode=OneWay}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   FontSize="11" TextWrapping="Wrap"
+                                                   TextAlignment="Center" Margin="8"
+                                                   Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- The name is the point of the card, so it
+                                     wraps instead of being cut off. -->
+                                <TextBlock Grid.Row="1"
+                                           Text="{x:Bind Name}"
+                                           Style="{StaticResource Omega.RowText}"
+                                           FontSize="12"
+                                           MaxLines="3" />
+                            </Grid>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </Border>
+
+            <controls:PanelSplitter Grid.Column="3" />
+
+            <ScrollViewer Grid.Column="4">
+                <StackPanel Spacing="12">
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Preview" FontWeight="SemiBold" />
+                            <Border Height="220" CornerRadius="6"
+                                    Background="{ThemeResource Omega.PanelBorderBrush}">
+                                <Grid>
+                                    <Image x:Name="PreviewImage" Stretch="Uniform" Margin="10" />
+                                    <TextBlock x:Name="PreviewMessage"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               TextWrapping="Wrap" TextAlignment="Center" Margin="16"
+                                               Foreground="{ThemeResource Omega.SubtleTextBrush}"
+                                               Text="Select an icon." />
+                                </Grid>
+                            </Border>
+                            <TextBlock x:Name="DetailName"
+                                       Style="{StaticResource Omega.NameText}"
+                                       FontSize="16" FontWeight="SemiBold"
+                                       Text="Nothing selected" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Author against" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailAuthoring"
+                                       Style="{StaticResource Omega.NameText}"
+                                       Text="Select an icon to see what size and format to author against." />
+                            <TextBlock x:Name="DetailStorage"
+                                       Style="{StaticResource Omega.NameText}"
+                                       FontSize="12"
+                                       Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Replace" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                                       Text="Your image is scaled to the slot, keeping its proportions, and re-encoded. The package is backed up once before its first change." />
+                            <Button x:Name="ReplaceButton"
+                                    Content="Choose an image and replace"
+                                    IsEnabled="False"
+                                    HorizontalAlignment="Stretch"
+                                    Click="ReplaceButton_Click" />
+                            <TextBlock x:Name="ReplaceMessage"
+                                       Style="{StaticResource Omega.NameText}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Where it lives" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailPath" Style="{StaticResource Omega.NameText}" FontSize="12" />
+                            <TextBlock x:Name="DetailFile" Style="{StaticResource Omega.NameText}" FontSize="12"
+                                       Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="All properties" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DetailProperties"
+                                       Style="{StaticResource Omega.NameText}"
+                                       FontFamily="Consolas" FontSize="12"
+                                       Text="—" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Background="{ThemeResource Omega.PanelBrush}"
+                BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Omega.PanelCorner}"
+                Padding="12,10,12,10">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" Style="{StaticResource Omega.NameText}" VerticalAlignment="Center"
+                           Text="Pick a game above, then scan." />
+                <ProgressBar x:Name="ScanBar" Grid.Column="1" Width="200"
+                             VerticalAlignment="Center" Visibility="Collapsed" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

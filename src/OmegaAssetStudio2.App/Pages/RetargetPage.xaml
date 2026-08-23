@@ -1,0 +1,331 @@
+<Page
+    x:Class="OmegaAssetStudio2.App.Pages.RetargetPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:OmegaAssetStudio2.App.Controls"
+    xmlns:pages="using:OmegaAssetStudio2.App.Pages">
+
+    <Grid Padding="{StaticResource Omega.PagePadding}" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="10">
+            <controls:ToolHeader
+                Title="Retarget"
+                Subtitle="Fit a model made elsewhere onto a skeleton from the game, and see the result before anything is kept." />
+            <controls:ClientSelector x:Name="ClientPicker" HorizontalAlignment="Left" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="330" MinWidth="280" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="320" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="360" MinWidth="300" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Step one and two: what receives the model, and the model itself -->
+            <ScrollViewer Grid.Column="0">
+                <StackPanel Spacing="12">
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="1 — Target" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                                       Text="The package holding the skeleton the model will be fitted to." />
+
+                            <!-- The button sits above the path rather than beside
+                                 it. Side by side, the path box is left too narrow
+                                 to show even its own placeholder, and a package
+                                 path is long. -->
+                            <Button x:Name="BrowseTargetButton" HorizontalAlignment="Stretch"
+                                    Content="Choose a package…" Click="BrowseTargetButton_Click" />
+
+                            <TextBlock x:Name="TargetPathBox"
+                                       Style="{StaticResource Omega.NameText}"
+                                       FontSize="12" TextWrapping="Wrap"
+                                       IsTextSelectionEnabled="True"
+                                       Foreground="{ThemeResource Omega.SubtleTextBrush}"
+                                       Text="No package chosen." />
+
+                            <TextBlock x:Name="TargetStatus" Style="{StaticResource Omega.NameText}"
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource Omega.SubtleTextBrush}"
+                                       Text="No package chosen." />
+
+                            <ComboBox x:Name="TargetMeshPicker" HorizontalAlignment="Stretch"
+                                      Header="Model in this package"
+                                      SelectionChanged="TargetMeshPicker_SelectionChanged" />
+
+                            <ComboBox x:Name="TargetLodPicker" HorizontalAlignment="Stretch"
+                                      Header="Detail"
+                                      SelectionChanged="TargetLodPicker_SelectionChanged" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="2 — Model to fit" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                                       Text="The model you want to bring in. Reads .fbx, .psk, .obj, .dae and .gltf." />
+
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="ImportSourceButton" Grid.Column="0"
+                                        HorizontalAlignment="Stretch"
+                                        Content="Import" Click="ImportSourceButton_Click" />
+                                <Button x:Name="ResetSourceButton" Grid.Column="1"
+                                        Content="Reset" Click="ResetSourceButton_Click" />
+                            </Grid>
+
+                            <TextBlock x:Name="SourceStatus" Style="{StaticResource Omega.NameText}"
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource Omega.SubtleTextBrush}"
+                                       Text="No model imported." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{ThemeResource Omega.PanelBrush}"
+                            BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Omega.PanelCorner}"
+                            Padding="{StaticResource Omega.PanelPadding}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="3 — How to fit it" FontWeight="SemiBold" />
+
+                            <CheckBox x:Name="KeepWeightsCheck" IsChecked="True"
+                                      Content="Use the model's own weights"
+                                      ToolTipService.ToolTip="Rebinds the model's own skin weights onto the target skeleton by bone name. Keeps faces, fingers and cloth as they were authored. Untick this when the model has no skeleton, or its bone names have nothing to do with the game's — it is then bound from the nearest part of the target's own surface instead."
+                                      Click="Option_Changed" />
+
+                            <ComboBox x:Name="ShapePicker" HorizontalAlignment="Stretch"
+                                      Header="Its shape"
+                                      SelectionChanged="ShapePicker_SelectionChanged"
+                                      ToolTipService.ToolTip="The game poses a model from its skeleton's rest pose. A model standing in a different pose looks right sitting still and is drawn wrongly in the game — on its side, or bent. Fit it to the rest pose when that happens.">
+                                <ComboBoxItem Content="Take it as it comes (normal)" />
+                                <ComboBoxItem Content="Fit the shape to the skeleton's rest pose" />
+                                <ComboBoxItem Content="Decide for me" />
+                            </ComboBox>
+
+                            <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                                       TextWrapping="Wrap"
+                                       Text="Take it as it comes suits a model exported from this character and edited. Fit it to the rest pose only when it comes from a different rig." />
+
+                            <CheckBox x:Name="FlipWindingCheck"
+                                      Content="Turn the surface the other way"
+                                      ToolTipService.ToolTip="Reverses every triangle. Use this if the model renders inside out."
+                                      Click="Option_Changed" />
+
+                            <Button x:Name="RunButton" HorizontalAlignment="Stretch"
+                                    Style="{ThemeResource AccentButtonStyle}"
+                                    Content="Fit the model" Click="RunButton_Click" />
+
+                            <Button x:Name="ExportButton" HorizontalAlignment="Stretch"
+                                    IsEnabled="False"
+                                    Content="Save the fitted model…" Click="ExportButton_Click"
+                                    ToolTipService.ToolTip="Writes the fitted model to a file you choose. Nothing is written into the game." />
+
+                            <Button x:Name="InstallButton" HorizontalAlignment="Stretch"
+                                    IsEnabled="False"
+                                    Content="Write into the game…" Click="InstallButton_Click"
+                                    ToolTipService.ToolTip="Replaces the model inside the target package with the fitted one. You are shown exactly what changes and asked to confirm, the original is backed up first, and the new file is swapped in only once it has been read back successfully." />
+
+                            <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                                       TextWrapping="Wrap"
+                                       Text="Only the last button changes the game. It backs the file up first." />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <controls:PanelSplitter Grid.Column="1" />
+
+            <!-- The result -->
+            <Border Grid.Column="2"
+                    Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Padding="10,10,10,8" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox x:Name="ViewPicker" Grid.Column="0" MinWidth="200"
+                                  SelectionChanged="ViewPicker_SelectionChanged">
+                            <ComboBoxItem Content="The model as imported" />
+                            <ComboBoxItem Content="Fitted to the skeleton" />
+                            <ComboBoxItem Content="The target's own model" />
+                        </ComboBox>
+
+                        <TextBlock x:Name="ViewCaption" Grid.Column="1"
+                                   VerticalAlignment="Center" Margin="8,0,0,0"
+                                   TextWrapping="Wrap"
+                                   Style="{StaticResource Omega.PageSubtitle}" />
+
+                        <Button x:Name="ResetViewButton" Grid.Column="2"
+                                Content="Reset view" Click="ResetViewButton_Click" />
+                    </Grid>
+
+                    <SwapChainPanel x:Name="Viewport" Grid.Row="1"
+                                    SizeChanged="Viewport_SizeChanged"
+                                    PointerPressed="Viewport_PointerPressed"
+                                    PointerMoved="Viewport_PointerMoved"
+                                    PointerReleased="Viewport_PointerReleased"
+                                    PointerCaptureLost="Viewport_PointerReleased"
+                                    PointerWheelChanged="Viewport_PointerWheelChanged" />
+
+                    <TextBlock x:Name="ViewportMessage" Grid.Row="1"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Margin="24" TextAlignment="Center" TextWrapping="Wrap"
+                               Style="{StaticResource Omega.NameText}"
+                               Text="Choose a target package, then import a model to fit to it." />
+
+                    <TextBlock Grid.Row="2" Padding="10,6,10,10"
+                               Style="{StaticResource Omega.PageSubtitle}"
+                               TextWrapping="Wrap"
+                               Text="Drag to turn. Right-drag to slide. Scroll to move closer. Nothing is written to the game until you choose to write it." />
+                </Grid>
+            </Border>
+
+            <controls:PanelSplitter Grid.Column="3" />
+
+            <!-- Skeleton and log -->
+            <Grid Grid.Column="4" RowSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" MinHeight="140" />
+                    <RowDefinition Height="*" MinHeight="140" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="{ThemeResource Omega.PanelBrush}"
+                        BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource Omega.PanelCorner}"
+                        Padding="{StaticResource Omega.PanelPadding}">
+                    <Grid RowSpacing="6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Target skeleton" FontWeight="SemiBold" />
+                        <TextBlock x:Name="BoneSummary" Grid.Row="1"
+                                   Style="{StaticResource Omega.NameText}" FontSize="12"
+                                   TextWrapping="Wrap" Text="No skeleton loaded." />
+
+                        <ListView x:Name="BoneList" Grid.Row="2"
+                                  SelectionMode="None"
+                                  ItemContainerStyle="{StaticResource Omega.ListRow}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="pages:BoneRow">
+                                    <TextBlock Text="{x:Bind Text}"
+                                               FontFamily="Consolas" FontSize="12"
+                                               TextWrapping="NoWrap"
+                                               Padding="2,4,2,4" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1"
+                        Background="{ThemeResource Omega.PanelBrush}"
+                        BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource Omega.PanelCorner}"
+                        Padding="{StaticResource Omega.PanelPadding}">
+                    <Grid RowSpacing="6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="What was found and fixed" FontWeight="SemiBold" />
+
+                        <!-- Findings and the running commentary share one
+                             scroller, so a long list of findings does not
+                             squeeze the log into nothing. -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollMode="Disabled">
+                            <StackPanel Spacing="6">
+
+                        <ItemsControl x:Name="FindingList" Margin="0,2,0,6">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="pages:FindingRow">
+                                    <Grid ColumnSpacing="8" Margin="0,4,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{x:Bind Mark}"
+                                                   Foreground="{x:Bind Colour}"
+                                                   FontWeight="SemiBold" />
+
+                                        <StackPanel Grid.Column="1">
+                                            <!-- Selectable: these say what a
+                                                 model needs fixing in the
+                                                 modelling tool, which is worth
+                                                 being able to copy out. -->
+                                            <TextBlock Text="{x:Bind What}"
+                                                       Style="{StaticResource Omega.NameText}"
+                                                       FontWeight="SemiBold" FontSize="12" />
+                                            <TextBlock Text="{x:Bind Detail}"
+                                                       Style="{StaticResource Omega.NameText}"
+                                                       FontSize="12"
+                                                       Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                                <TextBlock x:Name="LogText" Style="{StaticResource Omega.NameText}"
+                                           FontFamily="Consolas" FontSize="12"
+                                           TextWrapping="Wrap" IsTextSelectionEnabled="True"
+                                           Text="Nothing run yet." />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="{ThemeResource Omega.PanelBrush}"
+                BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Omega.PanelCorner}"
+                Padding="12,10,12,10">
+            <TextBlock x:Name="StatusText" Style="{StaticResource Omega.NameText}"
+                       VerticalAlignment="Center" TextWrapping="Wrap"
+                       Text="Pick a game above, then choose the package to fit a model to." />
+        </Border>
+    </Grid>
+</Page>

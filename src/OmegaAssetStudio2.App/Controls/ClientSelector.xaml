@@ -1,0 +1,28 @@
+<UserControl
+    x:Class="OmegaAssetStudio2.App.Controls.ClientSelector"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Every tool hosts this. Which install a tool acts on must be visible and
+        changeable without leaving the tool, because more than one client is
+        installed and acting on the wrong one is silent and destructive.
+    -->
+    <Grid ColumnSpacing="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" MinWidth="220" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0" Text="Game:" VerticalAlignment="Center"
+                   Style="{StaticResource Omega.PageSubtitle}" />
+
+        <ComboBox x:Name="ClientBox" Grid.Column="1"
+                  HorizontalAlignment="Stretch"
+                  SelectionChanged="ClientBox_SelectionChanged" />
+
+        <TextBlock x:Name="FormatText" Grid.Column="2" VerticalAlignment="Center"
+                   Style="{StaticResource Omega.PageSubtitle}" />
+    </Grid>
+</UserControl>

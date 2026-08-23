@@ -1,0 +1,75 @@
+﻿<Page
+    x:Class="OmegaAssetStudio2.App.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:OmegaAssetStudio2.App.Controls">
+
+    <ScrollViewer>
+        <StackPanel Padding="{StaticResource Omega.PagePadding}" Spacing="16">
+            <controls:ToolHeader
+                Title="Settings"
+                Subtitle="Applies to every tool." />
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Game installs" FontWeight="SemiBold" />
+                    <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                               Text="Add, remove, and choose between installs on the Home page. The one marked with an arrow is what tools use by default." />
+                    <TextBox x:Name="GameFolderBox" IsReadOnly="True" AcceptsReturn="True"
+                             TextWrapping="Wrap" MinHeight="90" PlaceholderText="None added yet" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Spacing="12">
+                    <ToggleSwitch x:Name="VerboseToggle"
+                                  Header="Detailed diagnostics"
+                                  OnContent="On" OffContent="Off"
+                                  Toggled="VerboseToggle_Toggled" />
+                    <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                               Text="Records every handled error, not just crashes. Useful when chasing a problem, noisy the rest of the time." />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Licences" FontWeight="SemiBold" />
+                    <TextBlock Style="{StaticResource Omega.NameText}"
+                               Text="This app bundles third-party components with their own licence terms, including one that is GPL-licensed and one set that is LGPL-licensed. The full notices ship next to the app as THIRD_PARTY_NOTICES.txt and LICENSE_LZO_NOTICE.txt." />
+                    <Button Content="Open licence notices" Click="OpenLicences_Click" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <Image Source="ms-appx:///Assets/OmegaMark.png"
+                           Height="72" Stretch="Uniform"
+                           VerticalAlignment="Top"
+                           AutomationProperties.Name="Omega Asset Studio 2" />
+                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="Omega Asset Studio 2" FontWeight="SemiBold" />
+                        <TextBlock x:Name="VersionText"
+                                   Style="{StaticResource Omega.PageSubtitle}"
+                                   Text="Version" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
