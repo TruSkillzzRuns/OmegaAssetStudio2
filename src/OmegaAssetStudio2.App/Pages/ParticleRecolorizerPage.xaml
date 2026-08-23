@@ -305,7 +305,8 @@
                                     <TextBlock x:Name="SkillsHeroNameText"
                                                FontSize="14" FontWeight="SemiBold"
                                                Text="Pick a hero on the left" />
-                                    <TextBlock FontSize="11" FontWeight="SemiBold" CharacterSpacing="120" Opacity="0.55"
+                                    <TextBlock FontSize="11" FontWeight="SemiBold" CharacterSpacing="120"
+                                               Foreground="{ThemeResource Omega.SubtleTextBrush}"
                                                Text="SKILLS" />
                                 </StackPanel>
                                 <!-- Icon-load progress bubble. Red = nothing yet,

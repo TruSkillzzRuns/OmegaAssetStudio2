@@ -22,6 +22,7 @@
                     <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FF24202E" />
                     <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FF3B3348" />
                     <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FFB258FF" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.OnAccentBrush" Color="#FF120F18" />
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key="Light">
@@ -29,6 +30,7 @@
                     <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FFEFEAF7" />
                     <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FFDCD4E7" />
                     <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FF7A26C9" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.OnAccentBrush" Color="#FFFFFFFF" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>

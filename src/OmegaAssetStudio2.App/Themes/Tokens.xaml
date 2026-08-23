@@ -55,6 +55,19 @@
             <Color x:Key="Omega.BannerColor">#FF0F0F19</Color>
 
             <!--
+                The shell's own surfaces. Left to the shipped defaults these
+                resolve to a backdrop this window does not have, and the pane
+                comes out as bare black with the tool names — dark text, in a
+                light theme — invisible on it. Stated plainly here instead, so
+                the pane and the page behind the panels are a real colour in
+                both themes.
+            -->
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#FF17151E" />
+            <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="#FF17151E" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF121016" />
+            <SolidColorBrush x:Key="Omega.WindowBrush" Color="#FF121016" />
+
+            <!--
                 A picked row has to be obvious at a glance. The shipped
                 highlight is a few percent lighter than the panel behind it,
                 which against this dark background cannot be seen at all — so a
@@ -111,6 +124,11 @@
 
             <Color x:Key="Omega.CautionColor">#FF8A6100</Color>
             <Color x:Key="Omega.BannerColor">#FF0F0F19</Color>
+
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#FFF1EDF7" />
+            <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="#FFF1EDF7" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FFFBFAFD" />
+            <SolidColorBrush x:Key="Omega.WindowBrush" Color="#FFFBFAFD" />
 
             <SolidColorBrush x:Key="ListViewItemBackgroundSelected"
                              Color="{StaticResource Omega.AccentColor}" Opacity="0.22" />

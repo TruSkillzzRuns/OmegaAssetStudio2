@@ -12,9 +12,10 @@
     <muxc:NavigationView
         x:Name="Nav"
         PaneDisplayMode="Left"
-        OpenPaneLength="240"
+        OpenPaneLength="270"
         IsBackButtonVisible="Collapsed"
         IsSettingsVisible="True"
+        Background="{ThemeResource Omega.WindowBrush}"
         SelectionChanged="Nav_SelectionChanged">
 
         <!--
@@ -84,7 +85,7 @@
 
             <muxc:NavigationViewItemSeparator />
 
-            <muxc:NavigationViewItem Content="Omega Backup and Restore" Tag="backup">
+            <muxc:NavigationViewItem Content="Backup and Restore" Tag="backup">
                 <muxc:NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Undo" />
                 </muxc:NavigationViewItem.Icon>

@@ -44,9 +44,19 @@ public static class AppTheme
     /// Safe to call before there is a window: it does nothing, and the theme is
     /// applied when the window sets itself up.
     /// </remarks>
-    public static void Apply()
+    public static void Apply() => Apply(App.MainWindow?.Content as FrameworkElement);
+
+    /// <summary>Draws <paramref name="root"/> and everything inside it in the chosen theme.</summary>
+    /// <remarks>
+    /// The window themes itself from its own constructor, where
+    /// <c>App.MainWindow</c> has not been assigned yet — it is assigned from the
+    /// result of that constructor. Taking the element as an argument is what
+    /// lets the theme be right on the first frame instead of after the first
+    /// visit to Settings.
+    /// </remarks>
+    public static void Apply(FrameworkElement? root)
     {
-        if (App.MainWindow?.Content is not FrameworkElement root) return;
+        if (root is null) return;
 
         root.RequestedTheme = Current switch
         {

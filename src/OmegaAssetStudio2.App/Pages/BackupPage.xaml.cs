@@ -341,6 +341,15 @@ public sealed partial class BackupPage : Page
     /// to look at that turns out to be empty. Counts are of what the game
     /// filter is already showing, so they agree with the tiles above.
     /// </remarks>
+    /// <summary>
+    /// Re-tints the tabs when the theme changes under them.
+    /// </summary>
+    /// <remarks>
+    /// Their colours are chosen in code rather than bound, so unlike everything
+    /// in XAML they do not follow a switch on their own.
+    /// </remarks>
+    private void Themed_ActualThemeChanged(FrameworkElement sender, object args) => RefreshCategoryTabs();
+
     private void RefreshCategoryTabs()
     {
         if (CategoryTabs is null) return;
@@ -380,8 +389,13 @@ public sealed partial class BackupPage : Page
 
             if (chosen)
             {
-                button.Background = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["Omega.AccentBrush"];
-                button.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Black);
+                // Asked of this page rather than of the application: the
+                // application answers with the Windows theme, which is not
+                // necessarily the one the page is drawn in. Black on the
+                // accent is right in one theme and unreadable in the other,
+                // so the colour to put on it is a token too.
+                button.Background = OmegaAssetStudio.WinUI.Services.OmegaThemeBrushes.For("OmegaAssetStudio.AccentBrush");
+                button.Foreground = OmegaAssetStudio.WinUI.Services.OmegaThemeBrushes.For("OmegaAssetStudio.OnAccentBrush");
             }
 
             button.Click += (sender, _) =>
@@ -426,6 +440,8 @@ public sealed partial class BackupPage : Page
         }
 
         RefreshCategoryTabs();
+        ActualThemeChanged -= Themed_ActualThemeChanged;
+        ActualThemeChanged += Themed_ActualThemeChanged;
 
         CountText.Text = _all.Count == 0
             ? string.Empty
