@@ -1,4 +1,4 @@
-# === Build output ===
+﻿# === Build output ===
 [Bb]in/
 [Oo]bj/
 [Dd]ebug/
@@ -47,10 +47,10 @@ installer/Output/
 *.snupkg
 
 # === Local tooling state ===
-# Working instructions for the assistant, and notes for whoever is at this
-# machine. Neither describes the software, so neither belongs in its history.
+# Working instructions for the assistant: not a description of the software, so
+# not part of its history. README.md is tracked — it is the only thing telling
+# somebody who finds this repository what it is and how to run it.
 CLAUDE.md
-README.md
 
 .claude/
 .vscode/*

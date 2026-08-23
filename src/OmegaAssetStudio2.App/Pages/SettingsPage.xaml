@@ -47,7 +47,7 @@
                 <StackPanel Spacing="8">
                     <TextBlock Text="Licences" FontWeight="SemiBold" />
                     <TextBlock Style="{StaticResource Omega.NameText}"
-                               Text="This app bundles third-party components with their own licence terms, including one that is GPL-licensed and one set that is LGPL-licensed. The full notices ship next to the app as THIRD_PARTY_NOTICES.txt and LICENSE_LZO_NOTICE.txt." />
+                               Text="This app is MIT-licensed and bundles no GPL component. It does use third-party components with terms of their own, and the full notices ship next to the app as THIRD_PARTY_NOTICES.txt." />
                     <Button Content="Open licence notices" Click="OpenLicences_Click" />
                 </StackPanel>
             </Border>
