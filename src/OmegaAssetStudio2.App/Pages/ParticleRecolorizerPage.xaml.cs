@@ -109,10 +109,11 @@ public sealed partial class ParticleRecolorizerPage : Page
         ("Gold",    Color.FromArgb(255, 0xD4, 0xA0, 0x32)),
     };
 
-    // See OmegaThemeBrushes.Dark — locked to the Dark theme dictionary so the
-    // programmatic cards stay consistent with the HUD-styled Pr* static
-    // brushes regardless of the user's Windows system theme.
-    private static Brush ThemedBrush(string key) => OmegaAssetStudio.WinUI.Services.OmegaThemeBrushes.Dark(key);
+    // Resolved against the theme this page is drawn in, so the cards built in
+    // code match the ones built in XAML whichever theme is chosen. Asking the
+    // application instead would answer with the Windows theme, which is not
+    // necessarily the one on screen.
+    private static Brush ThemedBrush(string key) => OmegaAssetStudio.WinUI.Services.OmegaThemeBrushes.For(key);
 
     public ParticleRecolorizerPage()
     {

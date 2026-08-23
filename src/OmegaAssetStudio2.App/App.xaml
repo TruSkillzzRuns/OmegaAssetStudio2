@@ -10,25 +10,25 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!--
-                The copied Skill Recolor page looks its brushes up at runtime,
-                by asking the application for its Dark theme dictionary by name.
-                That page and the others like it are drawn dark whatever the
-                system is set to, so the dictionary it asks for is provided here
-                rather than editing the copy to ask differently.
+                The Skill Recolor page was taken across from the first studio
+                whole, and looks these brushes up by name at runtime rather than
+                through XAML. Both themes are answered, so that page follows the
+                chosen theme like every other one; the values match the tokens
+                the rest of the application uses.
             -->
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FF1E1F24" />
-                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FF26272E" />
-                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FF33353D" />
-                    <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FF6BB8FF" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FF1B1922" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FF24202E" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FF3B3348" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FFB258FF" />
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FF1E1F24" />
-                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FF26272E" />
-                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FF33353D" />
-                    <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FF6BB8FF" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBackgroundBrush" Color="#FFF7F5FB" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelSecondaryBrush" Color="#FFEFEAF7" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.PanelBorderBrush" Color="#FFDCD4E7" />
+                    <SolidColorBrush x:Key="OmegaAssetStudio.AccentBrush" Color="#FF7A26C9" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>

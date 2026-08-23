@@ -14,7 +14,7 @@
                 artwork was drawn on and the strip is painted the same colour,
                 so the two read as one band with no edge between them.
             -->
-            <Border Background="#FF0F0F19"
+            <Border Background="{ThemeResource Omega.BannerBrush}"
                     BorderBrush="{ThemeResource Omega.AccentBrush}"
                     BorderThickness="0,0,0,1"
                     CornerRadius="{StaticResource Omega.PanelCorner}"

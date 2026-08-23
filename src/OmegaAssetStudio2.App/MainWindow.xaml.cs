@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OmegaAssetStudio2.App.Pages;
 
@@ -11,6 +11,9 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
         Title = "Omega Asset Studio 2";
         Nav.SelectedItem = Nav.MenuItems[0];
+
+        // After the content exists, because that is what carries the theme.
+        Services.AppTheme.Apply();
     }
 
     private void Nav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

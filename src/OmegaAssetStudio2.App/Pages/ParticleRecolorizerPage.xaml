@@ -323,7 +323,7 @@
                                         Visibility="Collapsed"
                                         ToolTipService.ToolTip="Skill icons are loaded in the background — red = none yet, yellow = some, green = all done.">
                                     <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                        <Ellipse x:Name="IconProgressDot" Width="8" Height="8" Fill="#D23C3C" />
+                                        <Ellipse x:Name="IconProgressDot" Width="8" Height="8" Fill="{ThemeResource Omega.ChangedBrush}" />
                                         <TextBlock x:Name="IconProgressText" FontSize="11" VerticalAlignment="Center" Text="Icons 0/0" />
                                     </StackPanel>
                                 </Border>
@@ -515,17 +515,17 @@
                                     Visibility="Collapsed"
                                     Padding="10"
                                     CornerRadius="4"
-                                    Background="#33E6C229"
-                                    BorderBrush="#FFE6C229"
+                                    Background="{ThemeResource Omega.CautionWash}"
+                                    BorderBrush="{ThemeResource Omega.CautionBrush}"
                                     BorderThickness="1">
                                 <!-- Grid (not horizontal StackPanel) so the text column is
                                      width-constrained and actually wraps instead of clipping. -->
                                 <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*">
-                                    <FontIcon Grid.Column="0" FontFamily="Segoe Fluent Icons" Glyph="&#xE7BA;" FontSize="14" Foreground="#FFE6C229" VerticalAlignment="Top" />
+                                    <FontIcon Grid.Column="0" FontFamily="Segoe Fluent Icons" Glyph="&#xE7BA;" FontSize="14" Foreground="{ThemeResource Omega.CautionBrush}" VerticalAlignment="Top" />
                                     <StackPanel Grid.Column="1" Spacing="3">
                                         <TextBlock FontSize="11" FontWeight="SemiBold" Text="Shared material in another UPK" TextWrapping="Wrap" />
                                         <!-- Names the specific shared material(s). -->
-                                        <TextBlock x:Name="CrossPackageMaterials" FontSize="10" FontWeight="SemiBold" Foreground="#FFE6C229" TextWrapping="Wrap" />
+                                        <TextBlock x:Name="CrossPackageMaterials" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource Omega.CautionBrush}" TextWrapping="Wrap" />
                                         <TextBlock x:Name="CrossPackageDetail" FontSize="10" Opacity="0.85" TextWrapping="Wrap"
                                                    Text="One or more particle emitters in this skill point to a material that lives in a different UPK." />
                                         <!-- Read-only dry run: shows exactly what a "localize to this
@@ -554,8 +554,8 @@
                                         Click="ApplyRecolorButton_Click"
                                         ToolTipService.ToolTip="Recolor this skill. A backup of every affected UPK is made first.">
                                     <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74E;" FontSize="13" Foreground="White" />
-                                        <TextBlock Text="Apply &amp; save" FontWeight="SemiBold" Foreground="White" />
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74E;" FontSize="13" />
+                                        <TextBlock Text="Apply &amp; save" FontWeight="SemiBold" />
                                     </StackPanel>
                                 </Button>
                                 <Button x:Name="RestoreButton"

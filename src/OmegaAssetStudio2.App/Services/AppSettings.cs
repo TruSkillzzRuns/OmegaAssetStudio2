@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using OmegaAssetStudio2.Core.Workspace;
 
@@ -57,6 +57,15 @@ public sealed class AppSettings
     /// rather than one installed, so it is remembered as a folder of its own.
     /// </summary>
     public string SwapSourceFolder { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Which colours the application draws itself in: System, Dark, or Light.
+    /// </summary>
+    /// <remarks>
+    /// System by default, so a first run looks like the rest of the machine.
+    /// Stored as a name rather than a number, so the file stays readable.
+    /// </remarks>
+    public string Theme { get; set; } = nameof(AppThemeChoice.System);
 
     /// <summary>
     /// A model file to stand previewed models on, chosen by the user. Remembered

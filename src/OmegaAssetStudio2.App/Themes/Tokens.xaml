@@ -45,6 +45,16 @@
             <Color x:Key="Omega.GoneColor">#FFCC4B45</Color>
 
             <!--
+                A caution, and the band the mark sits on. The caution is a
+                colour a person has to read words in, so it darkens for a light
+                background rather than staying the same amber. The band keeps
+                its near-black in both themes: the artwork on it was drawn on
+                that colour, and a light strip would show a dark rectangle.
+            -->
+            <Color x:Key="Omega.CautionColor">#FFE6C229</Color>
+            <Color x:Key="Omega.BannerColor">#FF0F0F19</Color>
+
+            <!--
                 A picked row has to be obvious at a glance. The shipped
                 highlight is a few percent lighter than the panel behind it,
                 which against this dark background cannot be seen at all — so a
@@ -67,6 +77,9 @@
             <SolidColorBrush x:Key="Omega.SafeWash" Color="{StaticResource Omega.SafeColor}" Opacity="0.10" />
             <SolidColorBrush x:Key="Omega.GoneBrush" Color="{StaticResource Omega.GoneColor}" />
             <SolidColorBrush x:Key="Omega.GoneWash" Color="{StaticResource Omega.GoneColor}" Opacity="0.12" />
+            <SolidColorBrush x:Key="Omega.CautionBrush" Color="{StaticResource Omega.CautionColor}" />
+            <SolidColorBrush x:Key="Omega.CautionWash" Color="{StaticResource Omega.CautionColor}" Opacity="0.14" />
+            <SolidColorBrush x:Key="Omega.BannerBrush" Color="{StaticResource Omega.BannerColor}" />
             <SolidColorBrush x:Key="Omega.AccentWash" Color="{StaticResource Omega.AccentColor}" Opacity="0.12" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
@@ -96,6 +109,9 @@
             <Color x:Key="Omega.SafeColor">#FF1E7F4D</Color>
             <Color x:Key="Omega.GoneColor">#FFB3261E</Color>
 
+            <Color x:Key="Omega.CautionColor">#FF8A6100</Color>
+            <Color x:Key="Omega.BannerColor">#FF0F0F19</Color>
+
             <SolidColorBrush x:Key="ListViewItemBackgroundSelected"
                              Color="{StaticResource Omega.AccentColor}" Opacity="0.22" />
             <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver"
@@ -113,6 +129,9 @@
             <SolidColorBrush x:Key="Omega.SafeWash" Color="{StaticResource Omega.SafeColor}" Opacity="0.10" />
             <SolidColorBrush x:Key="Omega.GoneBrush" Color="{StaticResource Omega.GoneColor}" />
             <SolidColorBrush x:Key="Omega.GoneWash" Color="{StaticResource Omega.GoneColor}" Opacity="0.12" />
+            <SolidColorBrush x:Key="Omega.CautionBrush" Color="{StaticResource Omega.CautionColor}" />
+            <SolidColorBrush x:Key="Omega.CautionWash" Color="{StaticResource Omega.CautionColor}" Opacity="0.14" />
+            <SolidColorBrush x:Key="Omega.BannerBrush" Color="{StaticResource Omega.BannerColor}" />
             <SolidColorBrush x:Key="Omega.AccentWash" Color="{StaticResource Omega.AccentColor}" Opacity="0.12" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>

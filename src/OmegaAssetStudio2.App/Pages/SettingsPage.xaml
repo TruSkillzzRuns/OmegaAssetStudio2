@@ -30,6 +30,25 @@
                     CornerRadius="{StaticResource Omega.PanelCorner}"
                     Padding="{StaticResource Omega.PanelPadding}">
                 <StackPanel Spacing="12">
+                    <TextBlock Text="Appearance" FontWeight="SemiBold" />
+                    <RadioButtons x:Name="ThemeChoice"
+                                  Header="Colours"
+                                  SelectionChanged="ThemeChoice_SelectionChanged">
+                        <x:String>Match Windows</x:String>
+                        <x:String>Dark</x:String>
+                        <x:String>Light</x:String>
+                    </RadioButtons>
+                    <TextBlock Style="{StaticResource Omega.PageSubtitle}"
+                               Text="Applies straight away, to every tool. Matching Windows also follows it when you change it there." />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Spacing="12">
                     <ToggleSwitch x:Name="VerboseToggle"
                                   Header="Detailed diagnostics"
                                   OnContent="On" OffContent="Off"

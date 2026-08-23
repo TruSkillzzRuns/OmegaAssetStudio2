@@ -15,6 +15,12 @@ public sealed partial class SettingsPage : Page
         _loading = true;
         GameFolderBox.Text = BuildClientSummary();
         VerboseToggle.IsOn = AppSettings.Current.VerboseDiagnostics;
+        ThemeChoice.SelectedIndex = AppTheme.Current switch
+        {
+            AppThemeChoice.Dark => 1,
+            AppThemeChoice.Light => 2,
+            _ => 0,
+        };
         _loading = false;
 
         VersionText.Text = "Version " + BuildVersion();
@@ -51,6 +57,20 @@ public sealed partial class SettingsPage : Page
         if (_loading) return;
         AppSettings.Current.VerboseDiagnostics = VerboseToggle.IsOn;
         AppSettings.Save();
+    }
+
+    private void ThemeChoice_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        // Seeding the control raises this too, and re-applying what is already
+        // set would be harmless but writing the settings file would not.
+        if (_loading) return;
+
+        AppTheme.Current = ThemeChoice.SelectedIndex switch
+        {
+            1 => AppThemeChoice.Dark,
+            2 => AppThemeChoice.Light,
+            _ => AppThemeChoice.System,
+        };
     }
 
     private void OpenLicences_Click(object sender, RoutedEventArgs e)
