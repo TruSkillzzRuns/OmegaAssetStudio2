@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using UpkManager.Models.UpkFile.Classes;
 using UpkManager.Models.UpkFile.Core;
 using UpkManager.Models.UpkFile.Engine;
@@ -92,6 +92,7 @@ public sealed class HeroSkillCatalog : IDisposable
     private KapgArchiveReader? _archive;
     private BlueprintRegistry? _registry;
     private PrototypeDirectoryReader? _protoDirectory;
+    private PowerPackageGraph? _packageGraph;
     private TypeDirectoryReader? _powerUnrealClasses;
     private TypeDirectoryReader? _powerIconPaths;
     private LocoIndex? _loco;
@@ -165,6 +166,7 @@ public sealed class HeroSkillCatalog : IDisposable
             {
                 _archive?.Dispose();
                 _archive = null;
+                _packageGraph = null;
                 _registry = null;
                 _calligraphyArchivePath = null;
                 return false;
@@ -479,6 +481,33 @@ public sealed class HeroSkillCatalog : IDisposable
     // asset-id values to readable paths). Used to FIND which field references the
     // condition/secondary effect a power applies on hit — the source of VFX (e.g.
     // secondary FX) that lives outside the power's own PowerFX components.
+    /// <summary>
+    /// The packages a power draws from, as its own prototype says.
+    /// </summary>
+    /// <remarks>
+    /// Returns nothing when the archive is closed or the power has no
+    /// prototype, so a caller can fall back to what it did before rather than
+    /// showing an empty panel.
+    /// </remarks>
+    public Task<IReadOnlyList<PowerPackageRef>> PackagesForPowerAsync(PowerEntry power)
+    {
+        return Task.Run<IReadOnlyList<PowerPackageRef>>(() =>
+        {
+            if (_archive is null || _protoDirectory is null) return Array.Empty<PowerPackageRef>();
+            if (power is null || string.IsNullOrEmpty(power.PrototypePath)) return Array.Empty<PowerPackageRef>();
+
+            try
+            {
+                _packageGraph ??= new PowerPackageGraph(_archive, _protoDirectory);
+                return _packageGraph.Walk(power.PrototypePath);
+            }
+            catch (Exception)
+            {
+                return Array.Empty<PowerPackageRef>();
+            }
+        });
+    }
+
     public Task<List<string>> DumpPowerPrototypeAsync(PowerEntry power)
     {
         return Task.Run(() =>
@@ -491,7 +520,12 @@ public sealed class HeroSkillCatalog : IDisposable
             try { data = _archive.ExtractEntry(entry); }
             catch (Exception e) { lines.Add($"(extract failed: {e.Message})"); return lines; }
             PrototypeBody body;
-            try { body = new PrototypeParser(data).Result; }
+            try
+            {
+                var parser = new PrototypeParser(data);
+                parser.TryParse(out _);
+                body = parser.Result;
+            }
             catch (Exception e) { lines.Add($"(parse failed: {e.Message})"); return lines; }
             lines.Add($"PROTO {power.PrototypePath}");
             DumpPrototypeBodyWithParents(body, 1, lines, 0);
@@ -516,7 +550,13 @@ public sealed class HeroSkillCatalog : IDisposable
         byte[] pdata;
         try { pdata = _archive.ExtractEntry(pe); } catch { return; }
         PrototypeBody pbody;
-        try { pbody = new PrototypeParser(pdata).Result; } catch { return; }
+        try
+        {
+            var pparser = new PrototypeParser(pdata);
+            pparser.TryParse(out _);
+            pbody = pparser.Result;
+        }
+        catch { return; }
         lines.Add($"{ind}PARENT => {parentPath}");
         DumpPrototypeBodyWithParents(pbody, depth + 1, lines, parentHops + 1);
     }

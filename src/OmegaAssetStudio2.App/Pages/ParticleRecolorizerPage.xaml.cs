@@ -1965,6 +1965,23 @@ public sealed partial class ParticleRecolorizerPage : Page
     private async System.Threading.Tasks.Task<int> CompleteColorsFromSkillPackagesAsync(
         PowerEntry? power, string? cookedDir)
     {
+        // What the power's own prototype says it uses. This is the game's
+        // answer rather than ours, so it separates one variant of a power from
+        // another and leaves out packages that only share a name.
+        var declared = new List<string>();
+
+        if (power is not null && !string.IsNullOrEmpty(cookedDir))
+        {
+            foreach (var reference in await _heroSkillCatalog.PackagesForPowerAsync(power).ConfigureAwait(true))
+            {
+                string full = System.IO.Path.Combine(cookedDir, reference.PackageFileName);
+                if (System.IO.File.Exists(full)) declared.Add(full);
+            }
+
+            OmegaAssetStudio.WinUI.App.WriteDiagnosticsLog("SkillRecolor.Declared",
+                $"{power.DisplayName}: the prototype names {declared.Count} package(s)");
+        }
+
         var seen = new System.Collections.Generic.HashSet<string>(
             _extraColorEntries.Where(en => !string.IsNullOrEmpty(en.ExportPath)).Select(en => en.ExportPath),
             System.StringComparer.OrdinalIgnoreCase);
@@ -1973,7 +1990,7 @@ public sealed partial class ParticleRecolorizerPage : Page
             .Select(en => en.SourceUpkPath)
             .Where(path => !string.IsNullOrEmpty(path))
             .Select(path => path!)
-            .Concat(VariantPackagesFor(power, cookedDir))
+            .Concat(declared.Count > 0 ? declared : VariantPackagesFor(power, cookedDir))
             .Where(path => !System.IO.Path.GetFileName(path)
                 .StartsWith("UC__MarvelPlayer_", System.StringComparison.OrdinalIgnoreCase))
             .Distinct(System.StringComparer.OrdinalIgnoreCase)
