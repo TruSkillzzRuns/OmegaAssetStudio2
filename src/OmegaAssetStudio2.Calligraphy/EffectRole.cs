@@ -89,7 +89,10 @@ public static class EffectRole
         if (Has(extra, "PBAoE")) return "the burst around you";
         if (Has(extra, "Hit")) return "the hit";
 
-        return "another version of it";
+        // A suffix nothing here recognises is left unsaid. "Another version of
+        // it" reads like information and is not: it fits every case and
+        // distinguishes none, which is worse than a blank line.
+        return string.Empty;
     }
 
     /// <summary>
@@ -159,6 +162,80 @@ public static class EffectRole
 
         return $"{role} — {slot}";
     }
+
+    /// <summary>
+    /// What an effect is, from the name of the particle system itself.
+    /// </summary>
+    /// <remarks>
+    /// The last resort and often the most specific one. A power that binds
+    /// nothing has no component to ask and a package name that says only which
+    /// power it belongs to, but the systems inside it are named for what they
+    /// draw. Counted over 4,166 of them: 1,119 say hit, 428 critical, 224
+    /// impact, 188 trail, 167 dust, 113 the burst of landing, 101 projectile,
+    /// 86 cast, 84 beam, 62 ground, 53 area.
+    /// <para>
+    /// Read most specific first, since the words nest — a critical hit is also
+    /// a hit, and an impact on snow is also an impact.
+    /// </para>
+    /// </remarks>
+    public static string FromSystemName(string? systemName)
+    {
+        string name = systemName ?? string.Empty;
+        if (name.Length == 0) return string.Empty;
+
+        foreach ((string token, string meaning) in SystemWords)
+        {
+            if (Has(name, token)) return meaning;
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// The words a particle system is named with, and what each one draws.
+    /// </summary>
+    /// <remarks>
+    /// Ordered, not alphabetical: the first match wins, so the narrow words
+    /// come before the broad ones they contain.
+    /// </remarks>
+    private static readonly (string Token, string Meaning)[] SystemWords =
+    [
+        ("agmwater", "the splash when it hits water"),
+        ("agmsnow", "the spray when it hits snow"),
+        ("agmmagma", "the burst when it hits magma"),
+        ("agmdirt", "the dirt it kicks up"),
+        ("agmdust", "the dust it kicks up"),
+        ("airburstdown", "the burst as it lands"),
+        ("thrownimpact", "the impact when thrown"),
+        ("uberhit", "a heavy hit"),
+        ("ubertell", "the wind-up before it lands"),
+        ("uberglint", "the glint before it lands"),
+        ("startdust", "the dust as it starts"),
+        ("crit", "a critical hit"),
+        ("miss", "a miss"),
+        ("hitfx", "the hit"),
+        ("impact", "the impact"),
+        ("projhit", "the projectile hitting"),
+        ("proj", "the projectile"),
+        ("projectile", "the projectile"),
+        ("trail", "the trail"),
+        ("beam", "the beam"),
+        ("cast", "as you cast it"),
+        ("launch", "as it launches"),
+        ("explo", "the explosion"),
+        ("burst", "the burst"),
+        ("flash", "the flash"),
+        ("shockwave", "the shockwave"),
+        ("ground", "what it draws on the ground"),
+        ("scorch", "the scorch it leaves"),
+        ("aoe", "the area it covers"),
+        ("dust", "the dust"),
+        ("smoke", "the smoke"),
+        ("debris", "the debris"),
+        ("glow", "the glow"),
+        ("loop", "while it lasts"),
+        ("hit", "the hit"),
+    ];
 
     /// <summary>Slot names that only repeat what the component already is.</summary>
     private static readonly string[] Generic =

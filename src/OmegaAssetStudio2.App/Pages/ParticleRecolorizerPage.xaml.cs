@@ -66,6 +66,12 @@ public sealed partial class ParticleRecolorizerPage : Page
     // reached through the power's own data, where there is no component to ask.
     private readonly Dictionary<string, string> _roleBySystem = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _roleByPackage = new(StringComparer.OrdinalIgnoreCase);
+
+    // What each colour's emitter draws with, keyed by the colour's own export
+    // path. A number says nothing; the material it tints says whether this is
+    // the smoke, the glow, or the lightning.
+    private readonly Dictionary<string, OmegaAssetStudio.Calligraphy.EmitterDrawing> _drawsByModule =
+        new(StringComparer.OrdinalIgnoreCase);
     // Last resolved VFX for the selected skill — used by the read-only
     // "Inspect color source" diagnostic.
     private OmegaAssetStudio.Calligraphy.PowerVfxResolver.ResolvedVfx? _currentVfx;
@@ -431,9 +437,16 @@ public sealed partial class ParticleRecolorizerPage : Page
         foreach (MaterialParameter p in parameters)
         {
             if (p.VectorValue is not Vector4 v) continue;
-            r += System.Math.Clamp(v.X, 0f, 1f);
-            g += System.Math.Clamp(v.Y, 0f, 1f);
-            b += System.Math.Clamp(v.Z, 0f, 1f);
+
+            // Brought under white by its own brightest channel, not clamped,
+            // for the same reason a single swatch is: an over-bright colour
+            // clamps to white and averages every group towards it.
+            float brightest = System.Math.Max(v.X, System.Math.Max(v.Y, v.Z));
+            float scale = brightest > 1f ? 1f / brightest : 1f;
+
+            r += System.Math.Clamp(v.X * scale, 0f, 1f);
+            g += System.Math.Clamp(v.Y * scale, 0f, 1f);
+            b += System.Math.Clamp(v.Z * scale, 0f, 1f);
             n++;
         }
         if (n == 0) return Color.FromArgb(255, 136, 136, 136);
@@ -2012,6 +2025,9 @@ public sealed partial class ParticleRecolorizerPage : Page
 
         foreach (string package in packages)
         {
+            foreach (var (module, drawing) in OmegaAssetStudio.Calligraphy.EmitterDraws.In(package))
+                _drawsByModule[module] = drawing;
+
             // Materials and material instances as well as particles, which is
             // what reading a package whole gives that reading its modules does
             // not.
@@ -2485,6 +2501,7 @@ public sealed partial class ParticleRecolorizerPage : Page
 
             _roleBySystem.Clear();
             _roleByPackage.Clear();
+            _drawsByModule.Clear();
 
             foreach (var binding in vfx?.Bindings ?? [])
             {
@@ -3079,6 +3096,12 @@ public sealed partial class ParticleRecolorizerPage : Page
     {
         if (_roleBySystem.TryGetValue(psName, out string? bound)) return bound;
 
+        // The system's own name, which is usually the most specific thing
+        // there is and is the only thing there is for a power that binds
+        // nothing.
+        string named = OmegaAssetStudio.Calligraphy.EffectRole.FromSystemName(psName);
+        if (named.Length > 0) return named;
+
         foreach (var entry in emitterMap.Values.SelectMany(v => v))
         {
             if (string.IsNullOrEmpty(entry.SourceUpkPath)) continue;
@@ -3235,7 +3258,34 @@ public sealed partial class ParticleRecolorizerPage : Page
     private Grid BuildColorSlotRow(HeroSkillCatalog.SkillColorEntry entry)
     {
         SlotKey key = new ExportSlotKey(entry.ExportPath);
-        return BuildColorSlotRow(key, entry.ParameterName, entry.OwnerLabel, entry.CurrentColor, entry.Kind, entry.Editable, entry.Shape);
+        string owner = entry.OwnerLabel;
+
+        if (!string.IsNullOrEmpty(entry.ExportPath)
+            && _drawsByModule.TryGetValue(entry.ExportPath, out var drawing))
+        {
+            owner += $"  ·  draws {drawing.Material}";
+            if (drawing.PeakParticles > 0) owner += $", up to {drawing.PeakParticles:N0}";
+        }
+
+        return BuildColorSlotRow(key, entry.ParameterName, owner, entry.CurrentColor, entry.Kind, entry.Editable, entry.Shape);
+    }
+
+    /// <summary>The colour to paint a swatch, from a colour that may be over-bright.</summary>
+    /// <remarks>
+    /// A colour under white is shown as it is. One above it is divided by its
+    /// own brightest channel, so 0, 6, 100 shows as the blue it draws rather
+    /// than as white.
+    /// </remarks>
+    private static Color ToSwatch(Vector4 colour)
+    {
+        float brightest = Math.Max(colour.X, Math.Max(colour.Y, colour.Z));
+        float scale = brightest > 1f ? 1f / brightest : 1f;
+
+        return Color.FromArgb(
+            255,
+            (byte)(Math.Clamp(colour.X * scale, 0f, 1f) * 255),
+            (byte)(Math.Clamp(colour.Y * scale, 0f, 1f) * 255),
+            (byte)(Math.Clamp(colour.Z * scale, 0f, 1f) * 255));
     }
 
     // The canonical one-line color-slot card: checkbox + swatch + name +
@@ -3305,13 +3355,13 @@ public sealed partial class ParticleRecolorizerPage : Page
         row.Children.Add(check);
         _slotCheckboxes.Add(check);
 
-        // Swatch — clamped to [0,1] for display since emissive values can blow
-        // past 1 and saturate to white; the writer still handles HDR.
-        var c = Color.FromArgb(
-            255,
-            (byte)(Math.Clamp(color.X, 0f, 1f) * 255),
-            (byte)(Math.Clamp(color.Y, 0f, 1f) * 255),
-            (byte)(Math.Clamp(color.Z, 0f, 1f) * 255));
+        // Swatch — scaled down by its own brightest channel rather than
+        // clamped. Effect colours are authored far past white: one emitter
+        // holds 5, 5, 100 and another 20, 12, 0.5. Clamping each channel makes
+        // both of those pure white, so every swatch on the page looked the same
+        // and told the reader nothing. Dividing by the brightest channel keeps
+        // the hue, which is the part being chosen.
+        var c = ToSwatch(color);
         var swatch = new Border
         {
             Width = 24, Height = 24,
@@ -3340,7 +3390,7 @@ public sealed partial class ParticleRecolorizerPage : Page
                 Text = subLabel,
                 FontSize = 10,
                 Opacity = 0.6,
-                TextTrimming = TextTrimming.CharacterEllipsis,
+                TextWrapping = TextWrapping.Wrap,
             });
         }
         Grid.SetColumn(text, 2);
