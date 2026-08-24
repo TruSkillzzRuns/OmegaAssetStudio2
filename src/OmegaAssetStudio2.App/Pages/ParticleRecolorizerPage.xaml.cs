@@ -2025,6 +2025,20 @@ public sealed partial class ParticleRecolorizerPage : Page
         OmegaAssetStudio.WinUI.App.WriteDiagnosticsLog("SkillRecolor.Complete",
             $"completed {packages.Count} package(s): {added} colour(s) the binding walk missed");
 
+        // Nothing is offered that nothing reads. A material's colour is baked
+        // into its compiled shader at cook time, so a parameter the shader was
+        // not built to read can be ticked and written and change nothing.
+        var live = LiveColours.Filter(cookedDir, _extraColorEntries, out int inert);
+
+        if (inert > 0)
+        {
+            _extraColorEntries.Clear();
+            _extraColorEntries.AddRange(live);
+
+            OmegaAssetStudio.WinUI.App.WriteDiagnosticsLog("SkillRecolor.Complete",
+                $"left out {inert} colour(s) whose material's compiled shader is never handed them");
+        }
+
         return added;
     }
 
