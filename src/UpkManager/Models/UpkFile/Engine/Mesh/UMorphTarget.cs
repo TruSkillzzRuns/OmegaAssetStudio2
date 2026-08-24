@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UpkManager.Models.UpkFile.Classes;
 using UpkManager.Models.UpkFile.Core;
@@ -91,7 +91,7 @@ namespace UpkManager.Models.UpkFile.Engine.Mesh
                     FMorphTargetLODModel lodModel = new();
                     // game uses the cooked-console 20-byte FMorphTargetVertInfo layout:
                     //   FVector PositionDelta (12) + FPackedNormal TangentZDelta (4) + INT SourceIdx (4)
-                    // Verified across all 4 Venom morphs:
+                    // Verified across all 4 morphs of one costume:
                     //   l_handscale3_fix  vertCount=492  → 492*20+12 = 9852 == tailRemaining ✓
                     //   mawtransition_fix vertCount=2532 → 2532*20+12 = 50652 ✓
                     //   r_handscale3_fix  vertCount=534  → 534*20+12 = 10692 ✓

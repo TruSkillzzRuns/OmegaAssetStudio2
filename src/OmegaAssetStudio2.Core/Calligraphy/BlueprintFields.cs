@@ -13,8 +13,8 @@ namespace OmegaAssetStudio2.Core.Calligraphy;
 /// Without them a caller is reduced to guessing from the values. A costume
 /// names four pictures and two of them are its portrait, at two sizes; the
 /// other two are its tile in the store and a banner, and one of those is also
-/// named twice. Nothing about the values tells them apart, so Cyclops's Noir
-/// costume came up wearing its store tile. The blueprint says which field is
+/// named twice. Nothing about the values tells them apart, so one costume
+/// came up wearing its store tile. The blueprint says which field is
 /// PortraitIconPath and the question stops being a guess.
 /// </para>
 /// <para>

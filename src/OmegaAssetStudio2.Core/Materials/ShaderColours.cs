@@ -1,4 +1,4 @@
-using OmegaAssetStudio2.Core.Packages;
+﻿using OmegaAssetStudio2.Core.Packages;
 using OmegaAssetStudio2.Core.Packages.Properties;
 
 namespace OmegaAssetStudio2.Core.Materials;
@@ -10,8 +10,8 @@ namespace OmegaAssetStudio2.Core.Materials;
 /// <remarks>
 /// Cooking strips the node graph out of a material. A material whose colour was
 /// a constant in that graph is left with nothing: no texture, no parameter, no
-/// colour on its vertices. Groot's string of lights is four such materials, and
-/// they came out as bare grey geometry.
+/// colour on its vertices. One costume's string of lights is four such
+/// materials, and they came out as bare grey geometry.
 /// <para>
 /// The colour survives in the compiled shader, which the game keeps in a
 /// separate cache and files under the same identity the material writes in its

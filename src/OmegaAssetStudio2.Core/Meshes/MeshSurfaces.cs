@@ -435,7 +435,7 @@ public static class MeshSurfaceResolver
                 // shader, and the shader cache files it under the same identity
                 // the material writes in its own resource.
                 //
-                // Groot's string of lights is four such materials. Without this
+                // One costume's string of lights is four such materials. Without this
                 // they are bare grey geometry.
                 if (colours is not null
                     && ShaderColours.TryFind(colours, materialPackage, material.Value.ExportIndex,

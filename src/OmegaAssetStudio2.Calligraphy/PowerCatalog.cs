@@ -48,7 +48,7 @@ public sealed class PowerEntry
     // skills, "Talents", "Traits", "MappedPowers", etc.
     public string Subfolder { get; set; } = string.Empty;
     // True when the prototype carries BOTH a DisplayName and an IconPath â€” the signature of a
-    // user-visible skill (Master of Mjolnir / God of Thunder tree slots). Buffs, passives,
+    // user-visible skill, the kind a power tree has slots for. Buffs, passives,
     // mechanic effects, summon-children etc. lack one or both. Used to filter the in-game
     // skill set out of the ~100+ Calligraphy prototypes per character.
     public bool IsVisibleSkill { get; set; }
@@ -78,8 +78,8 @@ public static class PowerCatalog
     //   Calligraphy/Entity/Characters/Avatars/Shipping/<Hero>.prototype
     // which lists each character's PowerProgressionTables -> PowerProgressionEntries,
     // each entry containing a PowerAssignment > Ability ref to the actual skill power.
-    // This matches what the in-game Powers UI shows (Master of Mjolnir / God of Thunder
-    // / Ultimate trees). Excludes passives, talents, buffs, mechanic effects, etc.
+    // This matches what the in-game Powers UI shows: the character's own trees
+    // and their ultimate. Excludes passives, talents, buffs, mechanic effects, etc.
     public static List<PowerEntry> LoadSkillTreeForCharacter(KapgArchiveReader archive, BlueprintRegistry registry, string characterToken, Action<string>? log = null)
     {
         List<PowerEntry> result = new();
@@ -635,10 +635,9 @@ public static class PowerCatalog
         // Strongest signal: PowerUnrealClass name from Powers/Types/PowerUnrealClass.type.
         // TargetClient uses several class-naming conventions:
         //   "Power<Hero>_<Skill>"  -> token "<skill>" (strip "Power" + "<Hero>_")
-        //   "PowerGroundSmash_Thor"       -> token "groundsmash"          (strip "Power" + "_Thor")
-        //   "PowerKnockdownCharge_Thor"   -> token "knockdowncharge"      (strip "Power" + "_Thor")
-        //   "PowerFlyMjolnir"             -> token "flymjolnir"           (strip "Power" only)
-        //   "PowerElementalStorm_Thor"    -> token "elementalstorm"       (strip "Power" + "_Thor")
+        //   "Power<Skill>_<Hero>"  -> token "<skill>" (strip "Power" + "_<Hero>")
+        //   "Power<Skill>"         -> token "<skill>" (strip "Power" only), for the
+        //                             skills whose class carries no character at all
         // We strip the "Power" prefix and any occurrence of "<CharacterToken>" with its
         // adjacent underscores, then lowercase + alnum.
         string classToken = string.Empty;

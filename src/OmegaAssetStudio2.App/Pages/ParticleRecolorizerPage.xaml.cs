@@ -1947,7 +1947,7 @@ public sealed partial class ParticleRecolorizerPage : Page
     /// PowerThor_LightningStrike, whose package holds six exports and no
     /// particles, while PowerThor_LightningStrikeOF and
     /// PowerThor_LightningStrikeNoOF beside it hold the whole effect — the
-    /// Odinforce and plain versions of the same skill.
+    /// empowered and plain versions of the same skill.
     /// <para>
     /// Found by the class name the power itself declares, not by its display
     /// name: the class is what the game writes the package after, so a package
@@ -2533,8 +2533,8 @@ public sealed partial class ParticleRecolorizerPage : Page
                 string? loneCooked = OmegaAssetStudio.WinUI.Services.GameInstallService.GetCookedDataDir();
 
                 // The power's own variants first. A skill whose own package is
-                // a stub is usually one the game splits in two — Crack the Sky
-                // ships an Odinforce and a non-Odinforce version, and its own
+                // a stub is usually one the game splits in two — one such
+                // ships an empowered and a plain version, and its own
                 // package holds six exports and no particles at all while the
                 // two beside it hold 180 KB apiece. Those are this skill's
                 // colours; the hero's trails are not.

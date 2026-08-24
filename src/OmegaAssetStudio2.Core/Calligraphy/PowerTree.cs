@@ -131,7 +131,7 @@ public static class PowerTree
     /// </summary>
     /// <remarks>
     /// Every costume has a portrait of its own and the character's own portrait
-    /// is not it — a list of ten Cyclops costumes showing the same face ten
+    /// is not it — a list of ten costumes showing the same face ten
     /// times says nothing about which is which. A costume's definition names
     /// both its picture and the model package it dresses, so the row's own file
     /// is what finds it, with no guessing at how the two names line up: the
@@ -503,7 +503,7 @@ public static class PowerTree
     /// the field says which is which. A costume names its portrait, its party
     /// portrait, a full-body picture, a store tile and a banner, and two of
     /// them are named twice over — so picking the one named most often gave
-    /// Cyclops's Noir costume its store tile.
+    /// one costume its store tile in place of its portrait.
     /// </remarks>
     private static string Named(
         Prototype proto,
