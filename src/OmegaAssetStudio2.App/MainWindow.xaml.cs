@@ -38,6 +38,11 @@ public sealed partial class MainWindow : Window
 
             string wanted = args[i + 1];
 
+            // Settings is not one of the pane's items, it is the pane's own
+            // button, so it is reached by name rather than by tag.
+            if (wanted.Equals("settings", StringComparison.OrdinalIgnoreCase) && Nav.SettingsItem is object settings)
+                return settings;
+
             foreach (object item in Nav.MenuItems)
             {
                 if (item is NavigationViewItem { Tag: string tag } && tag.Equals(wanted, StringComparison.OrdinalIgnoreCase))

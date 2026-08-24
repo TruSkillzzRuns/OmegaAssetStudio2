@@ -30,6 +30,38 @@
                     CornerRadius="{StaticResource Omega.PanelCorner}"
                     Padding="{StaticResource Omega.PanelPadding}">
                 <StackPanel Spacing="12">
+                    <TextBlock Text="Updates" FontWeight="SemiBold" />
+                    <TextBlock x:Name="UpdateStatusText"
+                               Style="{StaticResource Omega.PageSubtitle}"
+                               Text="Checking which version you have..." />
+
+                    <ProgressBar x:Name="UpdateProgress"
+                                 Visibility="Collapsed"
+                                 Minimum="0" Maximum="1" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button x:Name="CheckUpdateButton"
+                                Content="Check for updates"
+                                Click="CheckUpdate_Click" />
+                        <Button x:Name="InstallUpdateButton"
+                                Content="Download and install"
+                                Style="{ThemeResource AccentButtonStyle}"
+                                Visibility="Collapsed"
+                                Click="InstallUpdate_Click" />
+                        <Button x:Name="ReleaseNotesButton"
+                                Content="What changed"
+                                Visibility="Collapsed"
+                                Click="ReleaseNotes_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{ThemeResource Omega.PanelBrush}"
+                    BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Omega.PanelCorner}"
+                    Padding="{StaticResource Omega.PanelPadding}">
+                <StackPanel Spacing="12">
                     <TextBlock Text="Appearance" FontWeight="SemiBold" />
                     <RadioButtons x:Name="ThemeChoice"
                                   Header="Colours"

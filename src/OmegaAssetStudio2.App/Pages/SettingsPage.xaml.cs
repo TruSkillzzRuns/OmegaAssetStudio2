@@ -24,6 +24,7 @@ public sealed partial class SettingsPage : Page
         _loading = false;
 
         VersionText.Text = "Version " + BuildVersion();
+        UpdateStatusText.Text = $"You have version {BuildVersion()}.";
     }
 
     /// <summary>The version this build was stamped with.</summary>
@@ -71,6 +72,105 @@ public sealed partial class SettingsPage : Page
             2 => AppThemeChoice.Light,
             _ => AppThemeChoice.System,
         };
+    }
+
+    /// <summary>What the last check found, so the install button knows what to fetch.</summary>
+    private UpdateCheck? _update;
+
+    private async void CheckUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        CheckUpdateButton.IsEnabled = false;
+        InstallUpdateButton.Visibility = Visibility.Collapsed;
+        ReleaseNotesButton.Visibility = Visibility.Collapsed;
+        UpdateStatusText.Text = "Looking for a newer version...";
+
+        try
+        {
+            _update = await UpdateService.CheckAsync();
+            UpdateStatusText.Text = _update.Message;
+
+            if (_update.ReleaseUrl.Length > 0) ReleaseNotesButton.Visibility = Visibility.Visible;
+            if (!_update.IsNewer) return;
+
+            if (_update.DownloadUrl.Length == 0)
+            {
+                UpdateStatusText.Text = _update.Message + " That release publishes no build to install, so it has to be fetched by hand.";
+                return;
+            }
+
+            // Said before anything is fetched rather than after: under Program
+            // Files the copy needs rights this process does not have, and a
+            // hundred and twenty megabytes is a long way to go to find out.
+            if (!UpdateService.CanWriteToInstallFolder(out string folder))
+            {
+                UpdateStatusText.Text = _update.Message
+                    + $" This copy sits in {folder}, which it cannot write to — move it somewhere it can, or update by hand.";
+                return;
+            }
+
+            InstallUpdateButton.Content = _update.DownloadBytes > 0
+                ? $"Download and install ({_update.DownloadBytes / 1024d / 1024d:N0} MB)"
+                : "Download and install";
+
+            InstallUpdateButton.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex)
+        {
+            UpdateStatusText.Text = "The check did not finish: " + ex.Message;
+        }
+        finally
+        {
+            CheckUpdateButton.IsEnabled = true;
+        }
+    }
+
+    private async void InstallUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_update is null || _update.DownloadUrl.Length == 0) return;
+
+        InstallUpdateButton.IsEnabled = false;
+        CheckUpdateButton.IsEnabled = false;
+        UpdateProgress.Visibility = Visibility.Visible;
+        UpdateProgress.Value = 0;
+
+        try
+        {
+            var progress = new Progress<DownloadProgress>(p =>
+            {
+                UpdateProgress.IsIndeterminate = p.Fraction is null;
+                if (p.Fraction is double f) UpdateProgress.Value = f;
+
+                UpdateStatusText.Text = $"Downloading version {_update.Latest}... {p.Received / 1024d / 1024d:N0} MB";
+            });
+
+            string zip = await UpdateService.DownloadAsync(_update.DownloadUrl, _update.Latest, progress);
+
+            UpdateStatusText.Text = "Unpacking. The application will close and reopen on the new version.";
+
+            UpdateService.ApplyAndRestart(zip);
+
+            // The script is waiting for this process to end before it touches a
+            // file, so closing is the last step of installing.
+            Microsoft.UI.Xaml.Application.Current.Exit();
+        }
+        catch (Exception ex)
+        {
+            UpdateStatusText.Text = "The update did not install: " + ex.Message;
+            InstallUpdateButton.IsEnabled = true;
+            CheckUpdateButton.IsEnabled = true;
+            UpdateProgress.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void ReleaseNotes_Click(object sender, RoutedEventArgs e)
+    {
+        if (_update is null || _update.ReleaseUrl.Length == 0) return;
+
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = _update.ReleaseUrl,
+            UseShellExecute = true,
+        });
     }
 
     private void OpenLicences_Click(object sender, RoutedEventArgs e)
