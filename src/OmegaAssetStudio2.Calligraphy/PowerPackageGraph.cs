@@ -90,6 +90,15 @@ public sealed class PowerPackageGraph
         var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var queue = new Queue<(string Path, int Depth)>();
 
+        // A power's own pieces are named after it: Shockwave is followed by
+        // ShockwaveHotspotEffect, ShockwaveOFMissile, ShockwaveMissileEffect.
+        // What it references that is NOT named after it is shared — the basic
+        // melee every power of a kind chains into, the buff that marks a
+        // character as empowered — and belongs to the character rather than to
+        // this skill. Following those is how a sky-strike power ended up
+        // offering a hammer-chain impact and a death-from-above trail.
+        string family = Leaf(prototypePath);
+
         queue.Enqueue((prototypePath, 0));
 
         while (queue.Count > 0)
@@ -99,7 +108,7 @@ public sealed class PowerPackageGraph
             if (depth > maxDepth || !visited.Add(path)) continue;
             if (!TryRead(path, out PrototypeBody? body)) continue;
 
-            Collect(body!, path, depth, found, queue);
+            Collect(body!, path, depth, found, queue, family);
         }
 
         return found.Values
@@ -153,7 +162,8 @@ public sealed class PowerPackageGraph
         string foundIn,
         int depth,
         Dictionary<string, PowerPackageRef> found,
-        Queue<(string, int)> queue)
+        Queue<(string, int)> queue,
+        string family)
     {
         foreach (var group in body.Groups)
         {
@@ -163,7 +173,7 @@ public sealed class PowerPackageGraph
                 {
                     if (value is PrototypeBody nested)
                     {
-                        Collect(nested, foundIn, depth, found, queue);
+                        Collect(nested, foundIn, depth, found, queue, family);
                         continue;
                     }
 
@@ -178,6 +188,7 @@ public sealed class PowerPackageGraph
                     if (field.TypeCode != 'P') continue;
                     if (!_prototypes.IdToPath.TryGetValue(id, out string? path)) continue;
                     if (IsShared(path)) continue;
+                    if (!Leaf(path).StartsWith(family, StringComparison.OrdinalIgnoreCase)) continue;
 
                     queue.Enqueue((Archived(path), depth + 1));
                 }

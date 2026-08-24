@@ -2483,27 +2483,49 @@ public sealed partial class ParticleRecolorizerPage : Page
                 // colours; the hero's trails are not.
                 int fromVariants = 0;
 
-                // This costume's own version of the power, where the game ships
-                // one. Editing it recolours this costume and leaves the rest.
-                string? costumeOnly = CostumePackageFor(skill.Power, _selectedHero, loneCooked);
+                // What the power's own prototype says it draws from. Asked
+                // first, because it is the game's answer: a stub power that
+                // declares no particles of its own still names the variants
+                // that hold them, and names nothing else.
+                var declared = await _heroSkillCatalog.PackagesForPowerAsync(skill.Power).ConfigureAwait(true);
 
-                if (costumeOnly is not null)
+                foreach (var reference in declared)
                 {
+                    string full = Path.Combine(loneCooked ?? string.Empty, reference.PackageFileName);
+                    if (!File.Exists(full)) continue;
+
                     foreach (var en in await _heroSkillCatalog
-                                 .CollectColorsFromUpkAsync(costumeOnly).ConfigureAwait(true))
+                                 .CollectColorsFromUpkAsync(full).ConfigureAwait(true))
                     {
                         _extraColorEntries.Add(en);
                         fromVariants++;
                     }
                 }
 
-                foreach (string variant in VariantPackagesFor(skill.Power, loneCooked))
+                // Only where the prototype said nothing: the costume's own
+                // version of the power, then anything named after its class.
+                if (fromVariants == 0)
                 {
-                    foreach (var en in await _heroSkillCatalog
-                                 .CollectColorsFromUpkAsync(variant).ConfigureAwait(true))
+                    string? costumeOnly = CostumePackageFor(skill.Power, _selectedHero, loneCooked);
+
+                    if (costumeOnly is not null)
                     {
-                        _extraColorEntries.Add(en);
-                        fromVariants++;
+                        foreach (var en in await _heroSkillCatalog
+                                     .CollectColorsFromUpkAsync(costumeOnly).ConfigureAwait(true))
+                        {
+                            _extraColorEntries.Add(en);
+                            fromVariants++;
+                        }
+                    }
+
+                    foreach (string variant in VariantPackagesFor(skill.Power, loneCooked))
+                    {
+                        foreach (var en in await _heroSkillCatalog
+                                     .CollectColorsFromUpkAsync(variant).ConfigureAwait(true))
+                        {
+                            _extraColorEntries.Add(en);
+                            fromVariants++;
+                        }
                     }
                 }
 
@@ -2526,7 +2548,9 @@ public sealed partial class ParticleRecolorizerPage : Page
                 ParticleSystemChip.Visibility = Visibility.Collapsed;
                 CurrentUpkText.Text = skill.DisplayName;
 
-                string where = fromVariants > 0 ? "its own variant packages" : "the hero";
+                string where = declared.Count > 0 && fromVariants > 0
+                    ? $"the {declared.Count} package(s) its own data names"
+                    : fromVariants > 0 ? "its own variant packages" : "the hero";
 
                 CurrentSubText.Text = _extraColorEntries.Count == 0
                     ? "This skill has no particle bindings in its per-power UPK, and nothing beside it either."
