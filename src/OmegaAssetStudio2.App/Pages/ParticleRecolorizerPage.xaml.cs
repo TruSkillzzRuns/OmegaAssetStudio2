@@ -1985,7 +1985,8 @@ public sealed partial class ParticleRecolorizerPage : Page
 
                 declared.Add(full);
 
-                string role = OmegaAssetStudio.Calligraphy.EffectRole.FromPackageClass(reference.ClassName);
+                string role = OmegaAssetStudio.Calligraphy.EffectRole.FromPackageClass(
+                    reference.ClassName, power.PowerUnrealClassName);
                 if (role.Length > 0) _roleByPackage[reference.PackageFileName] = role;
             }
 

@@ -43,7 +43,7 @@ public static class EffectRole
     /// For colours reached through the power's data rather than through a bound
     /// component, where there is no component to ask.
     /// </remarks>
-    public static string FromPackageClass(string? className)
+    public static string FromPackageClass(string? className, string? powerClassName = null)
     {
         string name = className ?? string.Empty;
 
@@ -54,7 +54,42 @@ public static class EffectRole
         if (Starts(name, "MarvelAgent")) return "what it summons";
         if (Starts(name, "MarvelAttachment")) return "what it attaches";
 
-        return string.Empty;
+        return FromPowerPackage(name, powerClassName ?? string.Empty);
+    }
+
+    /// <summary>
+    /// What a power's own package holds, from what its name adds to the power's.
+    /// </summary>
+    /// <remarks>
+    /// Most of a power's packages are its own kind: 126 of 173 across five
+    /// characters, and 71 of those are the power itself with nothing added. The
+    /// rest add a word saying which piece they are — MissileEffect, Combo, Beam,
+    /// Hit, Knockback, PBAoE — and those words are the label.
+    /// <para>
+    /// A suffix with no known meaning is called another version rather than
+    /// guessed at. OF and NoOF are two such: they clearly separate a power's
+    /// empowered form from its plain one, but nothing in the name says which
+    /// way round, so neither is claimed.
+    /// </para>
+    /// </remarks>
+    private static string FromPowerPackage(string className, string powerClassName)
+    {
+        if (!Starts(className, "Power")) return string.Empty;
+        if (powerClassName.Length == 0) return "when you cast it";
+        if (!Starts(className, powerClassName)) return string.Empty;
+
+        string extra = className[powerClassName.Length..].Trim('_');
+
+        if (extra.Length == 0) return "when you cast it";
+
+        if (Has(extra, "MissileEffect")) return "the projectile";
+        if (Has(extra, "Combo")) return "the combo that follows";
+        if (Has(extra, "Beam")) return "the beam";
+        if (Has(extra, "Knockback")) return "the knockback";
+        if (Has(extra, "PBAoE")) return "the burst around you";
+        if (Has(extra, "Hit")) return "the hit";
+
+        return "another version of it";
     }
 
     /// <summary>
