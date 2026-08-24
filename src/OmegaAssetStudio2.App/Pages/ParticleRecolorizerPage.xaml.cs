@@ -60,6 +60,12 @@ public sealed partial class ParticleRecolorizerPage : Page
     // + particle module color distributions). Displayed below the editable MIC
     // groups; read-only until the byte-patcher lands in Phase 2.5.
     private readonly List<HeroSkillCatalog.SkillColorEntry> _extraColorEntries = new();
+
+    // What part of the skill an effect is, said plainly. Keyed by particle
+    // system where a bound component said so, and by package for the colours
+    // reached through the power's own data, where there is no component to ask.
+    private readonly Dictionary<string, string> _roleBySystem = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _roleByPackage = new(StringComparer.OrdinalIgnoreCase);
     // Last resolved VFX for the selected skill — used by the read-only
     // "Inspect color source" diagnostic.
     private OmegaAssetStudio.Calligraphy.PowerVfxResolver.ResolvedVfx? _currentVfx;
@@ -1975,7 +1981,12 @@ public sealed partial class ParticleRecolorizerPage : Page
             foreach (var reference in await _heroSkillCatalog.PackagesForPowerAsync(power).ConfigureAwait(true))
             {
                 string full = System.IO.Path.Combine(cookedDir, reference.PackageFileName);
-                if (System.IO.File.Exists(full)) declared.Add(full);
+                if (!System.IO.File.Exists(full)) continue;
+
+                declared.Add(full);
+
+                string role = OmegaAssetStudio.Calligraphy.EffectRole.FromPackageClass(reference.ClassName);
+                if (role.Length > 0) _roleByPackage[reference.PackageFileName] = role;
             }
 
             OmegaAssetStudio.WinUI.App.WriteDiagnosticsLog("SkillRecolor.Declared",
@@ -2470,6 +2481,20 @@ public sealed partial class ParticleRecolorizerPage : Page
         {
             var vfx = await _heroSkillCatalog.ResolveSkillVfxAsync(skill.Power, cookedDir).ConfigureAwait(true);
             _currentVfx = vfx; // stash for the "Inspect color source" diagnostic
+
+            _roleBySystem.Clear();
+            _roleByPackage.Clear();
+
+            foreach (var binding in vfx?.Bindings ?? [])
+            {
+                string system = binding.ParticleSystemRef ?? string.Empty;
+                if (system.Length == 0) continue;
+
+                string role = OmegaAssetStudio.Calligraphy.EffectRole.Describe(
+                    binding.ComponentClass, binding.ComponentName);
+
+                if (role.Length > 0) _roleBySystem[system] = role;
+            }
             _currentSkillRow = skill; // stash for the hero-scoped "find related effect" search
             if (vfx is null || vfx.Bindings.Count == 0)
             {
@@ -3009,7 +3034,7 @@ public sealed partial class ParticleRecolorizerPage : Page
 
         // Header row: particle system name + per-card All / None toggles so
         // the modder can flip the entire system in one click.
-        content.Children.Add(BuildCardHeader(psName, rowsForCard));
+        content.Children.Add(BuildCardHeader(psName, rowsForCard, RoleFor(psName, emitterMap)));
 
         // One row per emitter, then color rows beneath.
         foreach (var (emitterName, entries) in emitterMap.OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase))
@@ -3043,7 +3068,28 @@ public sealed partial class ParticleRecolorizerPage : Page
     // Header row used by both particle-system and material cards: title on
     // the left, two tiny "All / None" link-style buttons on the right that
     // fan out to the rows the card owns.
-    private Grid BuildCardHeader(string title, List<Grid> rowsForCard)
+    /// <summary>What part of the skill a particle system is.</summary>
+    /// <remarks>
+    /// The component that binds it says so exactly, where one does. Otherwise
+    /// the package it came from says what kind of thing it is, which is coarser
+    /// but still true.
+    /// </remarks>
+    private string RoleFor(string psName, Dictionary<string, List<HeroSkillCatalog.SkillColorEntry>> emitterMap)
+    {
+        if (_roleBySystem.TryGetValue(psName, out string? bound)) return bound;
+
+        foreach (var entry in emitterMap.Values.SelectMany(v => v))
+        {
+            if (string.IsNullOrEmpty(entry.SourceUpkPath)) continue;
+
+            string file = System.IO.Path.GetFileName(entry.SourceUpkPath);
+            if (_roleByPackage.TryGetValue(file, out string? owned)) return owned;
+        }
+
+        return string.Empty;
+    }
+
+    private Grid BuildCardHeader(string title, List<Grid> rowsForCard, string role = "")
     {
         var header = new Grid { ColumnSpacing = 8 };
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -3055,10 +3101,25 @@ public sealed partial class ParticleRecolorizerPage : Page
             FontSize = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             VerticalAlignment = VerticalAlignment.Center,
-            TextTrimming = TextTrimming.CharacterEllipsis,
+            TextWrapping = TextWrapping.Wrap,
         };
-        Grid.SetColumn(titleBlock, 0);
-        header.Children.Add(titleBlock);
+
+        var titleStack = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
+        titleStack.Children.Add(titleBlock);
+
+        if (role.Length > 0)
+        {
+            titleStack.Children.Add(new TextBlock
+            {
+                Text = role,
+                FontSize = 11,
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = ThemedBrush("OmegaAssetStudio.AccentBrush"),
+            });
+        }
+
+        Grid.SetColumn(titleStack, 0);
+        header.Children.Add(titleStack);
 
         var allBtn = new Button { Content = "All", FontSize = 10, MinHeight = 0, Padding = new Thickness(8, 2, 8, 2), Background = ThemedBrush("OmegaAssetStudio.PanelBackgroundBrush") };
         allBtn.Click += (_, _) => SetAllRowsChecked(rowsForCard, true);
