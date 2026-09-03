@@ -67,6 +67,7 @@ public sealed partial class MainWindow : Window
         {
             "skillrecolor" => typeof(ParticleRecolorizerPage),   // the tool taken across from the first studio, whole
             "voiceswapper" => typeof(VoiceSwapperPage),
+            "soundrestore" => typeof(SoundRestorePage),
             "iconeditor" => typeof(IconEditorPage),
             "mesh" => typeof(MeshPage),
             "retarget" => typeof(RetargetPage),

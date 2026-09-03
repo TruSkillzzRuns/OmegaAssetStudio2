@@ -1,0 +1,76 @@
+<Page
+    x:Class="OmegaAssetStudio2.App.Pages.SoundRestorePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:OmegaAssetStudio2.App.Controls">
+
+    <Grid Padding="{StaticResource Omega.PagePadding}" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="10">
+            <controls:ToolHeader
+                Title="Sound Restore"
+                Subtitle="Take sound back out of a changed package without redoing the rest of the work." />
+
+            <TextBlock Style="{StaticResource Omega.PageSubtitle}" TextWrapping="Wrap"
+                       Text="A package keeps its sounds as wiring: a table saying which moment plays which line. Put that table back the way it shipped and the sounds stop. The pictures, models and animations are different entries and are not touched." />
+        </StackPanel>
+
+        <!-- Pick the changed package. Its shipped twin is found for you. -->
+        <StackPanel Grid.Row="1" Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="PickButton" Click="PickButton_Click" MinWidth="150">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE8E5;" FontSize="14" />
+                        <TextBlock Text="Choose a package" />
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="RestoreButton" Click="RestoreButton_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        IsEnabled="False" MinWidth="170">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE7A7;" FontSize="14" />
+                        <TextBlock x:Name="RestoreLabel" Text="Put the sound back" />
+                    </StackPanel>
+                </Button>
+
+                <ProgressRing x:Name="Busy" IsActive="False" Width="20" Height="20"
+                              VerticalAlignment="Center" />
+            </StackPanel>
+
+            <TextBlock x:Name="ChosenText" TextWrapping="Wrap"
+                       Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+            <TextBlock x:Name="ShippedText" TextWrapping="Wrap"
+                       Foreground="{ThemeResource Omega.SubtleTextBrush}" />
+        </StackPanel>
+
+        <!-- What the package has, and what can be put back. -->
+        <Border Grid.Row="2"
+                Background="{ThemeResource Omega.PanelBrush}"
+                BorderBrush="{ThemeResource Omega.PanelBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Omega.PanelCorner}"
+                Padding="14">
+            <Grid RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" x:Name="FindingsText" TextWrapping="Wrap" />
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="FindingsList" Spacing="10" />
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <TextBlock Grid.Row="3" x:Name="StatusText" TextWrapping="Wrap" />
+    </Grid>
+</Page>
