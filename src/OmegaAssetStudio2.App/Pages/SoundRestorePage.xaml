@@ -24,7 +24,8 @@
         <!-- Pick the changed package. Its shipped twin is found for you. -->
         <StackPanel Grid.Row="1" Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button x:Name="PickButton" Click="PickButton_Click" MinWidth="150">
+                <Button x:Name="PickButton" Click="PickButton_Click" MinWidth="150"
+                        ToolTipService.ToolTip="Choose the package you have changed. The same package as the game ships it is found beside your install, and the two are set side by side so what differs about their sound can be seen.">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE8E5;" FontSize="14" />
                         <TextBlock Text="Choose a package" />
@@ -33,7 +34,8 @@
 
                 <Button x:Name="RestoreButton" Click="RestoreButton_Click"
                         Style="{StaticResource AccentButtonStyle}"
-                        IsEnabled="False" MinWidth="170">
+                        IsEnabled="False" MinWidth="170"
+                        ToolTipService.ToolTip="Puts back whichever tables are ticked, exactly as the game ships them, and quiets any single moments ticked underneath. Everything else in the package - its pictures, models and animations - is left untouched, and a copy is kept beside it first.">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE7A7;" FontSize="14" />
                         <TextBlock x:Name="RestoreLabel" Text="Put the sound back" />
@@ -49,11 +51,13 @@
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <ComboBox x:Name="SoundPicker" MinWidth="330" MaxWidth="460"
                           PlaceholderText="a sound this package already names"
+                          ToolTipService.ToolTip="Every sound this package already names. A package holds no sound of its own, only the name of one kept beside the game, so a moment can be pointed at anything in this list and no further."
                           SelectionChanged="SoundPicker_SelectionChanged"
                           IsEnabled="False" />
 
                 <Button x:Name="RepointButton" Click="RepointButton_Click"
-                        IsEnabled="False" MinWidth="150">
+                        IsEnabled="False" MinWidth="150"
+                        ToolTipService.ToolTip="Makes the ticked moments play the sound chosen on the left, instead of quieting them. Four bytes are written in place, so the table keeps its shape. A moment naming several sounds at once is left alone and said so.">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE8AB;" FontSize="14" />
                         <TextBlock x:Name="RepointLabel" Text="Play this instead" />
@@ -66,7 +70,8 @@
                  sometimes several takes. -->
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button x:Name="FindRecordingsButton" Click="FindRecordingsButton_Click"
-                        IsEnabled="False" MinWidth="180">
+                        IsEnabled="False" MinWidth="180"
+                        ToolTipService.ToolTip="Follows the ticked moments to the recordings behind them, in the containers beside the game. One line is rarely one recording: each language keeps its own, and a line spoken more than once keeps a take apiece. They are listed rather than replaced, so you can choose.">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE721;" FontSize="14" />
                         <TextBlock Text="Find the recordings" />
@@ -74,7 +79,8 @@
                 </Button>
 
                 <Button x:Name="ReplaceRecordingButton" Click="ReplaceRecordingButton_Click"
-                        IsEnabled="False" MinWidth="200">
+                        IsEnabled="False" MinWidth="200"
+                        ToolTipService.ToolTip="Puts a sound file of yours in place of the ticked recordings. It must be a .wem and no larger than the one it replaces. This writes to the containers beside the game, not to your package - so the line changes for everything that plays it, not for this costume alone.">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE898;" FontSize="14" />
                         <TextBlock x:Name="ReplaceLabel" Text="Replace ticked with a file" />
@@ -87,7 +93,8 @@
                  where they are. -->
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button x:Name="FromAnotherButton" Click="FromAnotherButton_Click"
-                        IsEnabled="False" MinWidth="210">
+                        IsEnabled="False" MinWidth="210"
+                        ToolTipService.ToolTip="Lists the sounds another package names that this one has not got. Choose any package with sound of its own - another costume, say - and its sounds are set against yours.">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE8B5;" FontSize="14" />
                         <TextBlock Text="Sounds from another package" />
@@ -95,7 +102,8 @@
                 </Button>
 
                 <Button x:Name="BringAcrossButton" Click="BringAcrossButton_Click"
-                        IsEnabled="False" MinWidth="170">
+                        IsEnabled="False" MinWidth="170"
+                        ToolTipService.ToolTip="Brings the ticked sounds into this package, along with the bank each asks for and the group they hang under. Only the naming comes across; the recordings stay where they are. Once in, they can be chosen above and given to a moment.">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE896;" FontSize="14" />
                         <TextBlock x:Name="BringLabel" Text="Bring ticked across" />

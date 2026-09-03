@@ -332,10 +332,33 @@ public sealed partial class SoundRestorePage : Page
             var mine = SoundImport.Where(target, "akevent");
             var theirs = SoundImport.Where(source, "akevent");
 
+            // Which moment plays each of them, in the package they come from.
+            //
+            // A sound's own name says what it is only if you already know the
+            // character; the moment says what it is for. The package they come
+            // from wires its own moments, so the same "victorybossvo plays
+            // ..." reading can be given here as for the package being worked
+            // on. Of one costume's 142 sounds, 53 are lines with a moment and
+            // the rest are footsteps and power noises with none.
+            var byMoment = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (PackageSounds.Hook hook in PackageSounds.Read(source))
+            {
+                if (byMoment.TryGetValue(hook.Sound, out string? had))
+                    byMoment[hook.Sound] = had + ", " + hook.Moment;
+                else
+                    byMoment[hook.Sound] = hook.Moment;
+            }
+
+            // The lines first, in their moment's order, then everything else.
             var news = theirs.Keys
                 .Where(k => !mine.ContainsKey(k))
-                .OrderBy(k => k, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(k => byMoment.ContainsKey(k) ? 0 : 1)
+                .ThenBy(k => byMoment.GetValueOrDefault(k, k), StringComparer.OrdinalIgnoreCase)
+                .ThenBy(k => k, StringComparer.OrdinalIgnoreCase)
                 .ToList();
+
+            int lines = news.Count(k => byMoment.ContainsKey(k));
 
             FindingsList.Children.Add(new TextBlock
             {
@@ -346,20 +369,25 @@ public sealed partial class SoundRestorePage : Page
                     ? Path.GetFileNameWithoutExtension(_sourcePath)
                       + " names nothing this package has not got already."
                     : $"{news.Count} sounds in {Path.GetFileNameWithoutExtension(_sourcePath)} "
-                      + "that this package does not name:",
+                      + "that this package does not name"
+                      + (lines > 0
+                          ? $" - {lines} of them lines with a moment of their own, listed first:"
+                          : ":"),
             });
 
             foreach (string one in news)
             {
+                string moment = byMoment.GetValueOrDefault(one, string.Empty);
+
                 var box = new CheckBox
                 {
                     Margin = new Thickness(26, 0, 0, 0),
                     Tag = one,
                     Content = new TextBlock
                     {
-                        Text = one,
+                        Text = moment.Length > 0 ? moment + "  plays  " + one : one,
                         FontSize = 12,
-                        Opacity = 0.8,
+                        Opacity = moment.Length > 0 ? 0.85 : 0.6,
                         TextWrapping = TextWrapping.Wrap,
                     },
                 };
