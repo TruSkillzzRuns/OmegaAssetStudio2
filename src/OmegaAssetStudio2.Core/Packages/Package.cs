@@ -229,6 +229,29 @@ public sealed class Package
     private const int ComponentPreamble = 16;
 
     /// <summary>
+    /// How far into an export's bytes its properties begin.
+    /// </summary>
+    /// <remarks>
+    /// A tag records where it sits within the run of properties it was read
+    /// from, not within the export. For most exports those are the same place;
+    /// for a component they are sixteen bytes apart, because of the preamble
+    /// above. Anything meaning to write a tag's own bytes back has to know
+    /// which, or it works on a window sixteen bytes adrift - and in a table
+    /// whose tags happen to be all of one size, that still reads back cleanly
+    /// while quietly having taken out the wrong one.
+    /// </remarks>
+    public int PropertiesBegin(int exportIndex)
+    {
+        ReadOnlySpan<byte> data = GetExportData(exportIndex);
+
+        Properties.PropertyBag? bag = Properties.PropertyReader.TryRead(data, Names);
+
+        if (bag is not null && bag.Tags.Count > 0) return 0;
+
+        return HasComponentPreamble(data, exportIndex) ? ComponentPreamble : 0;
+    }
+
+    /// <summary>
     /// Whether this export writes its own name where a component writes the
     /// name of its template.
     /// </summary>

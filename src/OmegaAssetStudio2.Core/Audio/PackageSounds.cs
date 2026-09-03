@@ -280,9 +280,17 @@ public static class PackageSounds
         var wanted = new HashSet<string>(moments, StringComparer.OrdinalIgnoreCase);
 
         // Where each one runs, in the order they sit.
+        //
+        // Counted from the start of the export rather than from the start of
+        // its properties, which are not the same place: a component writes
+        // sixteen bytes of preamble in front of its table, and a tag records
+        // where it sits within the table. Cutting at the tag's own number
+        // therefore works on a window sixteen bytes adrift.
+        int begins = package.PropertiesBegin(exportIndex);
+
         var cuts = bag.Tags
             .Where(t => wanted.Contains(t.Name))
-            .Select(t => (Start: t.TagOffset, End: t.TagOffset + t.TotalSize))
+            .Select(t => (Start: begins + t.TagOffset, End: begins + t.TagOffset + t.TotalSize))
             .OrderBy(c => c.Start)
             .ToList();
 
@@ -308,6 +316,119 @@ public static class PackageSounds
         kept.AddRange(was.AsSpan(at).ToArray());
 
         return kept.ToArray();
+    }
+
+    /// <summary>A sound a package already names, and where it keeps it.</summary>
+    public sealed record Available(int At, string Name);
+
+    /// <summary>
+    /// Every sound the package already names, which is what a moment may be
+    /// pointed at.
+    /// </summary>
+    /// <remarks>
+    /// A package holds no sound of its own - only the name of one kept in the
+    /// containers beside it. So a moment can be pointed at anything the package
+    /// already names and no further: naming something new means bringing its
+    /// entry in from wherever it is named, which is a larger thing than this.
+    /// </remarks>
+    public static IReadOnlyList<Available> SoundsIn(Package package)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+
+        var found = new List<Available>();
+
+        for (int i = 0; i < package.Exports.Count; i++)
+        {
+            string kind;
+            try { kind = package.GetExportClassName(i); }
+            catch (Exception) { continue; }
+
+            if (!kind.Equals("akevent", StringComparison.OrdinalIgnoreCase)) continue;
+
+            try { found.Add(new Available(i, package.GetExportName(i))); }
+            catch (Exception) { }
+        }
+
+        return found;
+    }
+
+    /// <summary>
+    /// One export's bytes with named moments playing a different sound.
+    /// </summary>
+    /// <remarks>
+    /// A moment that names one sound holds it as four bytes saying where in the
+    /// package that sound is kept. Pointing it elsewhere is writing four other
+    /// bytes in their place: the tag keeps its length, the table keeps its
+    /// shape, and nothing around it moves.
+    /// <para>
+    /// Only a moment holding a single sound is pointed this way. One holding a
+    /// list of them is left alone, because which of that list is meant is not
+    /// something to settle on someone else's behalf.
+    /// </para>
+    /// </remarks>
+    /// <summary>What came of pointing moments at a sound.</summary>
+    /// <param name="Bytes">The export's new bytes, or nothing where none moved.</param>
+    /// <param name="Pointed">The moments that now play it.</param>
+    /// <param name="HoldingLists">
+    /// Moments left alone because they name several sounds rather than one.
+    /// </param>
+    public sealed record Repointing(
+        byte[]? Bytes, IReadOnlyList<string> Pointed, IReadOnlyList<string> HoldingLists);
+
+    /// <param name="soundAt">Where the sound to play is kept in this package.</param>
+    public static Repointing Repointed(
+        Package package, int exportIndex, IReadOnlyCollection<string> moments, int soundAt)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+        ArgumentNullException.ThrowIfNull(moments);
+
+        var pointed = new List<string>();
+        var lists = new List<string>();
+
+        if (moments.Count == 0) return new(null, pointed, lists);
+        if (soundAt < 0 || soundAt >= package.Exports.Count) return new(null, pointed, lists);
+
+        PropertyBag? bag;
+        try { bag = package.TryReadProperties(exportIndex); }
+        catch (Exception) { return new(null, pointed, lists); }
+        if (bag is null) return new(null, pointed, lists);
+
+        var wanted = new HashSet<string>(moments, StringComparer.OrdinalIgnoreCase);
+
+        // Counted from the start of the export, not of its properties.
+        int begins = package.PropertiesBegin(exportIndex);
+
+        byte[] bytes;
+        try { bytes = package.GetExportData(exportIndex).ToArray(); }
+        catch (Exception) { return new(null, pointed, lists); }
+
+        // A reference is written as one more than where the thing sits, with
+        // nothing written as a plain nought.
+        byte[] pointing = BitConverter.GetBytes(soundAt + 1);
+
+        foreach (PropertyTag tag in bag.Tags)
+        {
+            if (!wanted.Contains(tag.Name)) continue;
+
+            // One holding several is left as it is, and said so, rather than
+            // being quietly passed over.
+            if (!tag.TypeName.Equals("objectproperty", StringComparison.OrdinalIgnoreCase)
+                || tag.Size != 4)
+            {
+                lists.Add(tag.Name);
+                continue;
+            }
+
+            int where = begins + tag.ValueOffset;
+
+            if (where < 0 || where + 4 > bytes.Length) continue;
+
+            pointing.CopyTo(bytes, where);
+
+            pointed.Add(tag.Name);
+        }
+
+        return new(pointed.Count > 0 ? bytes : null, pointed, lists);
     }
 
     /// <summary>Where a package keeps each of its exports, by name and class.</summary>

@@ -127,6 +127,46 @@ public static class CostumeVoices
 
         if (wanted.Count == 0) return [];
 
+        return Behind(client, wanted, language, cancellationToken);
+    }
+
+    /// <summary>
+    /// Every recording that named events play, wherever it is kept.
+    /// </summary>
+    /// <remarks>
+    /// The same walk as above, driven by a set of events handed in rather than
+    /// by everything a costume asks for. That is what lets one line be followed
+    /// to the recording behind it: a package names its events, an event is a
+    /// number made from its name, and a bank says which recordings that number
+    /// sets off.
+    /// </remarks>
+    public static IReadOnlyList<PlacedSound> SoundsBehind(
+        GameClient client,
+        IReadOnlyCollection<string> eventNames,
+        string language,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(eventNames);
+
+        var wanted = new Dictionary<uint, string>();
+
+        foreach (string one in eventNames)
+        {
+            if (string.IsNullOrWhiteSpace(one)) continue;
+
+            wanted.TryAdd(SoundNameHash.Of(one), one);
+        }
+
+        return wanted.Count == 0 ? [] : Behind(client, wanted, language, cancellationToken);
+    }
+
+    private static IReadOnlyList<PlacedSound> Behind(
+        GameClient client,
+        Dictionary<uint, string> wanted,
+        string language,
+        CancellationToken cancellationToken)
+    {
         var placed = new List<PlacedSound>();
         var seen = new HashSet<(string, uint)>();
 

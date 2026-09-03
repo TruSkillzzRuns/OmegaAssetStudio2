@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="OmegaAssetStudio2.App.Pages.SoundRestorePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -42,6 +42,65 @@
 
                 <ProgressRing x:Name="Busy" IsActive="False" Width="20" Height="20"
                               VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Or point the ticked moments at a different sound the package
+                 already names, rather than quieting them. -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <ComboBox x:Name="SoundPicker" MinWidth="330" MaxWidth="460"
+                          PlaceholderText="a sound this package already names"
+                          SelectionChanged="SoundPicker_SelectionChanged"
+                          IsEnabled="False" />
+
+                <Button x:Name="RepointButton" Click="RepointButton_Click"
+                        IsEnabled="False" MinWidth="150">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE8AB;" FontSize="14" />
+                        <TextBlock x:Name="RepointLabel" Text="Play this instead" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- Or change the recording itself. Shown before anything is
+                 replaced, because one line keeps a recording per language and
+                 sometimes several takes. -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="FindRecordingsButton" Click="FindRecordingsButton_Click"
+                        IsEnabled="False" MinWidth="180">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE721;" FontSize="14" />
+                        <TextBlock Text="Find the recordings" />
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="ReplaceRecordingButton" Click="ReplaceRecordingButton_Click"
+                        IsEnabled="False" MinWidth="200">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE898;" FontSize="14" />
+                        <TextBlock x:Name="ReplaceLabel" Text="Replace ticked with a file" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- Or bring in sounds the package does not name at all, from one
+                 that does. Only their names come across; the recordings stay
+                 where they are. -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="FromAnotherButton" Click="FromAnotherButton_Click"
+                        IsEnabled="False" MinWidth="210">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE8B5;" FontSize="14" />
+                        <TextBlock Text="Sounds from another package" />
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="BringAcrossButton" Click="BringAcrossButton_Click"
+                        IsEnabled="False" MinWidth="170">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE896;" FontSize="14" />
+                        <TextBlock x:Name="BringLabel" Text="Bring ticked across" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
 
             <TextBlock x:Name="ChosenText" TextWrapping="Wrap"

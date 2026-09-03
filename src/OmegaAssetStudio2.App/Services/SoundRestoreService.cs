@@ -1,5 +1,6 @@
-using OmegaAssetStudio2.Core.Audio;
+﻿using OmegaAssetStudio2.Core.Audio;
 using OmegaAssetStudio2.Core.Packages;
+using OmegaAssetStudio2.Core.Workspace;
 using UpkManager.Repository;
 
 namespace OmegaAssetStudio2.App.Services;
@@ -39,6 +40,180 @@ public static class SoundRestoreService
         string beside = Path.Combine(cookedPath, Path.GetFileName(changedPath));
 
         return File.Exists(beside) ? beside : null;
+    }
+
+    /// <summary>
+    /// The recordings behind named events, wherever they are kept.
+    /// </summary>
+    /// <remarks>
+    /// A package names an event; a container beside it holds the recording that
+    /// event sets off. Each language keeps its own recording of the same line,
+    /// and a line spoken more than once keeps a take apiece, so one event
+    /// commonly stands in front of several recordings. All of them are handed
+    /// back rather than one being chosen here.
+    /// </remarks>
+    public static IReadOnlyList<PlacedSound> RecordingsBehind(
+        GameClient client, IReadOnlyCollection<string> eventNames)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(eventNames);
+
+        if (eventNames.Count == 0) return [];
+
+        try
+        {
+            return CostumeVoices.SoundsBehind(client, eventNames, string.Empty);
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// Puts a different recording in place of one the game ships.
+    /// </summary>
+    /// <remarks>
+    /// This writes to the container, not to the package: the package only names
+    /// the sound. So it changes that line for everything that plays it, not for
+    /// one costume alone, and the container is what gets copied aside.
+    /// </remarks>
+    public static async Task<Outcome> ReplaceRecordingAsync(
+        PlacedSound sound, string filePath, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(sound);
+
+        if (!File.Exists(filePath)) return new(false, "that file is not there");
+
+        byte[] replacement;
+
+        try
+        {
+            replacement = await File.ReadAllBytesAsync(filePath, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return new(false, "that file could not be read: " + ex.Message);
+        }
+
+        AudioPackage container;
+
+        try { container = AudioPackage.Open(sound.ContainerPath); }
+        catch (Exception ex) { return new(false, "the container could not be opened: " + ex.Message); }
+
+        AudioReplaceResult done = await AudioReplacer
+            .ReplaceAsync(container, sound.Entry, replacement, ct)
+            .ConfigureAwait(false);
+
+        return new(done.Succeeded,
+            done.Message,
+            done.Succeeded ? 1 : 0,
+            done.Succeeded ? sound.ContainerPath : null);
+    }
+
+    /// <summary>
+    /// Points single moments at a different sound the package already names.
+    /// </summary>
+    /// <remarks>
+    /// For when a line is not wanted gone but wanted different. What a moment
+    /// plays is four bytes saying where that sound is kept, so this writes four
+    /// others in their place - the table keeps its length and its shape, and
+    /// nothing around it moves.
+    /// </remarks>
+    /// <param name="soundName">The sound to play, as the package names it.</param>
+    public static async Task<Outcome> RepointAsync(
+        string changedPath,
+        string holder,
+        IReadOnlyCollection<string> moments,
+        string soundName,
+        CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(moments);
+
+        if (!File.Exists(changedPath)) return new(false, "the package is not there");
+        if (moments.Count == 0) return new(false, "nothing was chosen to point elsewhere");
+        if (string.IsNullOrWhiteSpace(soundName)) return new(false, "no sound was chosen");
+
+        int at = -1;
+        PackageSounds.Repointing pointing;
+
+        try
+        {
+            Package package = Package.Open(changedPath);
+
+            for (int i = 0; i < package.Exports.Count; i++)
+            {
+                if (!package.GetExportName(i).Equals(holder, StringComparison.OrdinalIgnoreCase)) continue;
+
+                at = i;
+                break;
+            }
+
+            if (at < 0) return new(false, $"the package holds no table called {holder}");
+
+            PackageSounds.Available? sound = PackageSounds.SoundsIn(package)
+                .FirstOrDefault(s => s.Name.Equals(soundName, StringComparison.OrdinalIgnoreCase));
+
+            if (sound is null)
+                return new(false, $"this package does not name a sound called {soundName}");
+
+            pointing = PackageSounds.Repointed(package, at, moments, sound.At);
+        }
+        catch (Exception ex)
+        {
+            return new(false, "the package could not be read: " + ex.Message);
+        }
+
+        // What was left alone, and why, said plainly rather than passed over.
+        string lists = pointing.HoldingLists.Count == 0
+            ? string.Empty
+            : $"  {string.Join(", ", pointing.HoldingLists)} name several sounds rather than one, "
+              + "so they were left as they are.";
+
+        if (pointing.Bytes is null)
+            return new(false, "none of those could be pointed elsewhere." + lists);
+
+        string backup = changedPath + ".before-sound-restore";
+
+        try
+        {
+            File.Copy(changedPath, backup, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            return new(false, "the package could not be copied aside first: " + ex.Message);
+        }
+
+        try
+        {
+            byte[] bytes = await File.ReadAllBytesAsync(changedPath, ct).ConfigureAwait(false);
+
+            var repository = new UpkFileRepository();
+
+            var header = await repository.LoadUpkFile(changedPath).ConfigureAwait(false);
+            await header.ReadHeaderAsync(null).ConfigureAwait(false);
+
+            bytes = header.CompressedChunks.Count > 0
+                ? OmegaAssetStudio.UpkRepacker.RepackCompressed(bytes, header, at, pointing.Bytes)
+                : OmegaAssetStudio.UpkRepacker.Repack(bytes, header, at, pointing.Bytes);
+
+            string between = changedPath + ".omtmp";
+
+            await File.WriteAllBytesAsync(between, bytes, ct).ConfigureAwait(false);
+            File.Move(between, changedPath, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            try { File.Copy(backup, changedPath, overwrite: true); }
+            catch (Exception) { }
+
+            return new(false, "it could not be written, and the package was put back: " + ex.Message);
+        }
+
+        return new(true,
+            $"{string.Join(", ", pointing.Pointed)} now play {soundName}." + lists,
+            pointing.Pointed.Count,
+            backup);
     }
 
     /// <summary>
