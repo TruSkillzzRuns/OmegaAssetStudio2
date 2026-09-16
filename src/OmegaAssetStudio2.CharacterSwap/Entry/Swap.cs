@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 using OmegaAssetStudio.WinUI.Modules.CharacterSwap;
 
@@ -260,6 +260,11 @@ public static class Swap
         };
     }
 
+    /// <summary>Whether a package belongs to a single character or object.</summary>
+    private static bool OwnPackage(string fileName) =>
+        fileName.StartsWith("UC__", StringComparison.OrdinalIgnoreCase)
+        && fileName.EndsWith("_SF.upk", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>
     /// The pass over the packages a costume borrows its shaders from, done
     /// exactly as the tool this comes from does it.
@@ -302,6 +307,19 @@ public static class Swap
                 string called = Path.GetFileName(pair.TargetSiblingPath);
                 string beside = Path.Combine(intoFolder, called);
                 string building = beside + ".building";
+
+                // Only another character's own package may be rewritten. A
+                // costume also borrows shaders from packages the whole game
+                // loads - the startup and main game packages, level instance
+                // and group packages - and swapping the other version of one
+                // of those in replaces everything else it holds, which stops
+                // the game from starting.
+                if (!OwnPackage(called))
+                {
+                    note($"Left alone, used by the whole game: {called}");
+                    wrote.AppendLine($"Left alone, used by the whole game: {called}");
+                    continue;
+                }
 
                 note($"The package it borrows from: {called}");
 
