@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.UI.Xaml;
@@ -21,7 +21,7 @@ public sealed class IconCard : INotifyPropertyChanged
     private string _placeholderGlyph = string.Empty;
     private bool _requested;
 
-    public required TextureInfo Info { get; init; }
+    public required TextureInfo Info { get; set; }
     public required string Name { get; init; }
     public required string PackageName { get; init; }
 
@@ -335,16 +335,9 @@ public sealed partial class IconEditorPage : Page
 
         DetailProperties.Text = DescribeProperties(info);
 
-        // Say up front whether this one can be changed, rather than letting the
-        // user pick a file and only then be refused. Passing the content folder
-        // lets textures stored in the shared cache be replaced too.
-        ReplaceResult permission = TextureReplacer.CanReplace(
-            Package.Open(info.PackagePath), info, _client.CookedPath);
+        KeepInPackageBox.Visibility = info.IsCacheBacked ? Visibility.Visible : Visibility.Collapsed;
 
-        ReplaceButton.IsEnabled = permission.Succeeded;
-        ReplaceMessage.Text = permission.Succeeded && info.IsCacheBacked
-            ? permission.Message
-            : permission.Succeeded ? string.Empty : permission.Message;
+        ShowPermission(info);
 
         PreviewImage.Source = null;
         PreviewMessage.Text = "Decoding...";
@@ -361,6 +354,36 @@ public sealed partial class IconEditorPage : Page
                 ? "This icon's pixels are in the shared texture cache, which is not readable yet."
                 : $"No preview: {info.FormatName} is not decoded yet.";
         }
+    }
+
+    /// <summary>Whether a cached icon's new picture goes into its own package.</summary>
+    private bool KeepInPackage(TextureInfo info) =>
+        info.IsCacheBacked && KeepInPackageBox.IsChecked == true;
+
+    /// <summary>
+    /// Says up front whether this one can be changed, rather than letting the
+    /// user pick a file and only then be refused. Passing the content folder
+    /// lets textures stored in the shared cache be replaced too.
+    /// </summary>
+    private void ShowPermission(TextureInfo info)
+    {
+        if (_client is null) return;
+
+        Package package = Package.Open(info.PackagePath);
+
+        ReplaceResult permission = KeepInPackage(info)
+            ? TextureInliner.CanInline(package, info)
+            : TextureReplacer.CanReplace(package, info, _client.CookedPath);
+
+        ReplaceButton.IsEnabled = permission.Succeeded;
+        ReplaceMessage.Text = permission.Succeeded && info.IsCacheBacked
+            ? permission.Message
+            : permission.Succeeded ? string.Empty : permission.Message;
+    }
+
+    private void KeepInPackageBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (IconGrid?.SelectedItem is IconCard card) ShowPermission(card.Info);
     }
 
     private async void ReplaceButton_Click(object sender, RoutedEventArgs e)
@@ -400,11 +423,23 @@ public sealed partial class IconEditorPage : Page
             _images.Clear();
             Package package = Package.Open(info.PackagePath);
 
-            ReplaceResult result = await TextureReplacer.ReplaceAsync(
-                package, info, source.Rgba, source.Width, source.Height, _client.CookedPath);
+            ReplaceResult result = KeepInPackage(info)
+                ? await TextureInliner.ReplaceAsync(package, info, source.Rgba, source.Width, source.Height)
+                : await TextureReplacer.ReplaceAsync(
+                    package, info, source.Rgba, source.Width, source.Height, _client.CookedPath);
 
             ReplaceMessage.Text = result.Message;
             StatusText.Text = result.Message;
+
+            if (result.Succeeded && info.IsCacheBacked
+                && TextureInfo.TryRead(Package.Open(info.PackagePath), info.ExportIndex) is { } now
+                && !now.IsCacheBacked)
+            {
+                // Its pixels are in the package now, and it is described afresh.
+                card.Info = info = now;
+                IconGrid_SelectionChanged(IconGrid, null!);
+                ReplaceMessage.Text = result.Message;
+            }
 
             if (result.Succeeded)
             {

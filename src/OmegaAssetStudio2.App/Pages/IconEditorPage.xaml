@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="OmegaAssetStudio2.App.Pages.IconEditorPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -208,6 +208,15 @@
                             <TextBlock Text="Replace" FontWeight="SemiBold" />
                             <TextBlock Style="{StaticResource Omega.PageSubtitle}"
                                        Text="Your image is scaled to the slot, keeping its proportions, and re-encoded. The package is backed up once before its first change." />
+                            <CheckBox x:Name="KeepInPackageBox"
+                                      IsChecked="True"
+                                      Visibility="Collapsed"
+                                      Checked="KeepInPackageBox_Changed"
+                                      Unchecked="KeepInPackageBox_Changed"
+                                      ToolTipService.ToolTip="On: the new picture is stored in this icon package, so the package alone carries the change and can be shared on its own. Off: the picture is written into the shared texture cache, which only a whole install carries.">
+                                <TextBlock TextWrapping="Wrap"
+                                           Text="Store the new picture in this package, not the shared texture cache" />
+                            </CheckBox>
                             <Button x:Name="ReplaceButton"
                                     Content="Choose an image and replace"
                                     IsEnabled="False"
